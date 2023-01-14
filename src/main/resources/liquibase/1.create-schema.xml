@@ -1,0 +1,108 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="1" author="Piotr Szerszeń">
+    <createTable tableName="icd">
+      <column computed="false" name="id" type="bigint">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_icd"/>
+      </column>
+      <column computed="false" name="code1" type="varchar(1)">
+        <constraints nullable="false"/>
+      </column>
+      <column computed="false" name="name1" type="varchar(200)">
+        <constraints nullable="false"/>
+      </column>
+      <column computed="false" name="code2" type="varchar(3)">
+        <constraints nullable="false"/>
+      </column>
+      <column computed="false" name="name2" type="longtext">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <createTable tableName="patient">
+      <column computed="false" name="id" type="bigint">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_patient"/>
+      </column>
+      <column computed="false" name="firstname" type="varchar(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column computed="false" name="lastname" type="varchar(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column computed="false" name="pesel" type="varchar(11)">
+        <constraints nullable="false" unique="true"/>
+      </column>
+      <column computed="false" name="address1" type="varchar(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column computed="false" name="address2" type="varchar(100)"/>
+      <column computed="false" name="city" type="varchar(100)">
+        <constraints nullable="false"/>
+      </column>
+      <column computed="false" name="zip_code" type="varchar(20)">
+        <constraints nullable="false"/>
+      </column>
+      <column computed="false" name="phone" type="varchar(20)">
+        <constraints nullable="false"/>
+      </column>
+      <column computed="false" name="birth" type="DATE">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <createTable tableName="examination">
+      <column computed="false" name="id" type="bigint">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_examination"/>
+      </column>
+      <!-- many to one -->
+      <column computed="false" name="patient_id" type="bigint">
+        <constraints nullable="false"/>
+      </column>
+      <column computed="false" name="date" type="datetime">
+        <constraints nullable="false"/>
+      </column>
+      <column computed="false" name="code" type="varchar(1)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <createTable tableName="examination_details">
+      <column computed="false" name="id" type="bigint">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="PK_examination_details"/>
+      </column>
+      <!-- many to one -->
+      <column computed="false" name="examination_id" type="bigint">
+        <constraints nullable="false"/>
+      </column>
+      <column computed="false" name="code" type="varchar(3)">
+        <constraints nullable="false"/>
+      </column>
+      <column computed="false" name="value" type="int(11)"/>
+      <column computed="false" name="staff_name" type="varchar(100)"/>
+      <column computed="false" name="date" type="datetime">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <addForeignKeyConstraint
+      baseTableName="examination"
+      baseColumnNames="patient_id"
+      constraintName="FK_examination_patient_id"
+      referencedTableName="patient"
+      referencedColumnNames="id"
+      onDelete="NO ACTION"
+      onUpdate="NO ACTION"/>
+
+    <addForeignKeyConstraint
+      baseTableName="examination_details"
+      baseColumnNames="examination_id"
+      constraintName="FK_examination_details_examination_id"
+      referencedTableName="examination"
+      referencedColumnNames="id"
+      onDelete="NO ACTION"
+      onUpdate="NO ACTION"/>
+  </changeSet>
+</databaseChangeLog>
