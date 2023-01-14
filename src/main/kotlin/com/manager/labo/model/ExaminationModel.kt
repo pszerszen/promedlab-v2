@@ -3,20 +3,27 @@ package com.manager.labo.model
 import com.manager.labo.utils.DisplayInJTable
 import com.manager.labo.view.components.TableModelName
 
-data class ExaminationModel(
-    val id: Long,
+class ExaminationModel {
+    var id: Long? = null
+
     @DisplayInJTable(TableModelName.REQUESTS, 0)
-    val requestDate: String,
+    var requestDate: String? = null
+
     @DisplayInJTable(TableModelName.REQUESTS, 1)
-    val code: String,
+    var code: String? = null
+
     @DisplayInJTable(TableModelName.REQUESTS, 2)
-    val pesel: String,
+    var pesel: String? = null
+
     @DisplayInJTable(TableModelName.REQUESTS, 3)
-    val lastName: String,
+    var lastName: String? = null
+
     @DisplayInJTable(TableModelName.REQUESTS, 4)
-    val firstName: String,
+    var firstName: String? = null
+
     @DisplayInJTable(TableModelName.REQUESTS, 5)
-    val address: String,
+    var address: String? = null
+
     @DisplayInJTable(TableModelName.REQUESTS, 6)
-    val phone: String
-)
+    var phone: String? = null
+}

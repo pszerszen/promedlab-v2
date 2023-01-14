@@ -20,6 +20,6 @@ class Examination : AbstractEntity() {
     var code: String? = null
 
     @OneToMany(mappedBy = "examination", fetch = FetchType.LAZY)
-    var examinationDetails: Set<ExaminationDetails> = HashSet()
+    var examinationDetails: MutableSet<ExaminationDetails> = mutableSetOf()
 
 }
