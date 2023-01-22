@@ -25,7 +25,7 @@ class ExaminationSummaryModel {
         this.description = description
     }
 
-    constructor(id: Long?, code: String?, description: String?, staffName: String?, value: Int) {
+    constructor(id: Long?, code: String?, description: String?, staffName: String?, value: Int?) {
         this.id = id
         this.code = code
         this.description = description

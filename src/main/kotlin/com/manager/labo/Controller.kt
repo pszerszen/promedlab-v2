@@ -61,7 +61,7 @@ class Controller : JFrame("PRO-LAB-MANAGER"), ActionListener, WindowListener {
                 val currentModel2: ExaminationModel? = examinationList?.currentModel
                 if (currentModel2 != null) {
                     val examinationModel: ExaminationRequestModel = examinationService
-                        .getExaminationRequestModel(currentModel2.id)
+                        .getExaminationRequestModel(currentModel2.id!!)
                     examinationDetails = ExaminationDetails(examinationModel)
                     setExaminationDetailsActions()
                 }

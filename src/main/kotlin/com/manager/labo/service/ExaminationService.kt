@@ -43,46 +43,32 @@ class ExaminationService(
         get() = examinationRepository.findAll()
             .map { mapToExaminationModel(it) }
 
-    fun getExaminationRequestModel(examinationRequestId: Long?): ExaminationRequestModel {
-        return map(examinationRepository.findByIdOrNull(examinationRequestId))
-    }
+    fun getExaminationRequestModel(examinationRequestId: Long): ExaminationRequestModel =
+        map(examinationRepository.getReferenceById(examinationRequestId))
 
-    fun create(examinationRequestModel: ExaminationRequestModel?) {
+    fun create(examinationRequestModel: ExaminationRequestModel) {
         val examination: Examination = map(examinationRequestModel)
-        var patient: Patient = examination.patient
-        if (patient.id == null) {
-            patientRepository.save<Patient>(patient)
-        } else {
-            patient = patientRepository.merge(patient)
-        }
-        examination.patient = patient
-        val examinationDetailses: Set<ExaminationDetails> = examination.getExaminationDetailses()
-        examination.setExaminationDetailses(HashSet<E>())
-        examinationRepository.save<Examination>(examination)
-        examinationDetailses.forEach(Consumer { examiantionDetails: ExaminationDetails? ->
-            examinationDetailsRepository.save<ExaminationDetails>(
-                examiantionDetails
-            )
-        })
+        val patient: Patient = examination.patient
+        patientRepository.save(patient)
+
+        val examinationDetailses: Set<ExaminationDetails> = examination.examinationDetails
+
+        examinationRepository.save(examination.copy(patient = patient, examinationDetails = mutableSetOf()))
+        examinationDetailses.forEach { examinationDetailsRepository.save(it) }
     }
 
     fun update(examinationRequestModel: ExaminationRequestModel) {
         examinationRequestModel.examinations.forEach(Consumer { examinationDetailsModel: ExaminationSummaryModel ->
-            val examinationDetails: ExaminationDetails = examinationDetailsRepository.get(examinationDetailsModel.id)
-            examinationDetails.staffName = examinationDetailsModel.staffName
-            examinationDetails.value = examinationDetailsModel.value
-            examinationDetailsRepository.merge(examinationDetails)
+            val examinationDetails: ExaminationDetails = examinationDetailsRepository.getReferenceById(examinationDetailsModel.id!!)
+                .copy(staffName = examinationDetailsModel.staffName, value = examinationDetailsModel.value)
+            examinationDetailsRepository.save(examinationDetails)
         })
-    }
-
-    fun getById(id: Long?): ExaminationModel {
-        return mapToExaminationModel(examinationRepository.get(id))
     }
 
     @Throws(IllegalArgumentException::class, IllegalAccessException::class)
     fun validate(model: ExaminationRequestModel, validateExamiantions: Boolean): Set<String> {
-        val errors: MutableSet<String> = Sets.newHashSet()
-        for (field in model.javaClass.getDeclaredFields()) {
+        val errors: MutableSet<String> = mutableSetOf()
+        for (field in model.javaClass.declaredFields) {
             extractAndValidateField(field, model, errors)
         }
         val examinations: List<ExaminationSummaryModel?> = model.examinations
@@ -90,15 +76,15 @@ class ExaminationService(
             errors.add("Należy wybrać przynajmniej jedno badanie.")
         }
         if (validateExamiantions) {
-            examinations.forEach(Consumer<ExaminationSummaryModel> { examination: ExaminationSummaryModel ->
-                for (field in examination.javaClass.getDeclaredFields()) {
+            examinations.forEach { examination ->
+                for (field in examination!!.javaClass.declaredFields) {
                     try {
                         extractAndValidateField(field, examination, errors)
                     } catch (e: Exception) {
                         log.error("Error while validating.", e)
                     }
                 }
-            })
+            }
         }
         return errors
     }
@@ -137,7 +123,7 @@ class ExaminationService(
     private fun map(model: ExaminationRequestModel): Examination {
         val id: Long? = model.examinationId
         val newExamination = id == null
-        val examination: Examination = if (id == null) Examination() else examinationRepository.findByIdOrNull(id)!!
+        val examination: Examination = if (newExamination) Examination() else examinationRepository.findByIdOrNull(id)!!
         var patient: Patient? = patientRepository.getByPesel(model.pesel!!)
         if (patient == null) {
             patient = Patient()
@@ -165,19 +151,11 @@ class ExaminationService(
         }
         examinations.forEach(Consumer {
             if (newExamination) {
-                val detail = ExaminationDetails()
-                detail.code = it.code
-                detail.date = LocalDateTime.now()
-                detail.examination = examination
-                examinationDetailses.add(detail)
+                examinationDetailses.add(ExaminationDetails(null, examination, it.code!!, null, null, LocalDateTime.now()))
             } else {
                 val detail = examinationDetailses
-                    .stream()
-                    .filter { d: ExaminationDetails -> d.code == it.code }
-                    .findFirst()
-                    .get()
-                detail.staffName = it.staffName
-                detail.value = it.value
+                    .first { d: ExaminationDetails -> d.code == it.code }
+                    .copy(staffName = it.staffName, value = it.value)
             }
         })
         return examination
@@ -195,16 +173,7 @@ class ExaminationService(
         examination.patient.city,
         examination.patient.phone,
         examination.examinationDetails
-            .map {
-                val summaryModel = ExaminationSummaryModel()
-                val code = it.code
-                summaryModel.id = it.id
-                summaryModel.code = code
-                summaryModel.description = icdService.getByCode2(code).name2
-                summaryModel.staffName = it.staffName
-                summaryModel.value = it.value
-                summaryModel
-            }
+            .map { ExaminationSummaryModel(it.id, it.code, icdService.getByCode2(it.code).name2, it.staffName, it.value) }
             .toMutableList()
     )
 
