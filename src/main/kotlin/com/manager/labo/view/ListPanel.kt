@@ -1,6 +1,6 @@
 package com.manager.labo.view
 
-import com.manager.labo.utils.ActionCommands
+import com.manager.labo.utils.BACK
 import com.manager.labo.view.components.JPanelEnchancer
 import com.manager.labo.view.components.LaboTableModel
 import java.awt.Color
@@ -44,7 +44,7 @@ abstract class ListPanel<T: Any> : JPanel() {
         back.background = Color(0, 153, 255)
         back.icon = ImageIcon(ListPanel::class.java.getResource("/com/sun/javafx/scene/web/skin/Undo_16x16_JFX.png"))
         back.setBounds(10, 513, 89, 57)
-        back.actionCommand = ActionCommands.BACK.
+        back.actionCommand = BACK
         this.add(back)
         JPanelEnchancer(this).standardActions()
     }

@@ -8,4 +8,4 @@ package com.manager.labo.utils
     AnnotationTarget.VALUE_PARAMETER
 )
 @Retention(AnnotationRetention.RUNTIME)
-annotation class ValidDate(val dateFormat: String, val message: String)
+annotation class ValidDate(val dateFormat: String = "yyyy-MM-dd", val message: String)

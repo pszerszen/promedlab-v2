@@ -32,4 +32,9 @@ class ExaminationSummaryModel {
         this.staffName = staffName
         this.value = value
     }
+
+    fun setStaffNameAndValue(staffName: String, value: Int) {
+        this.staffName = staffName
+        this.value = value
+    }
 }

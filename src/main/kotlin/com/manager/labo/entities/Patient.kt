@@ -1,40 +1,61 @@
 package com.manager.labo.entities
 
 import jakarta.persistence.*
+import org.hibernate.Hibernate
 import java.time.LocalDate
 
 
 @Entity
 @Table(name = "patient")
-class Patient : AbstractEntity() {
+data class Patient(
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    val id: Long? = null,
+
     @Column(name = "firstname", columnDefinition = "varchar(100)", nullable = false)
-    var firstName: String? = null
-
+    val firstName: String,
     @Column(name = "lastname", columnDefinition = "varchar(100)", nullable = false)
-    var lastName: String? = null
-
+    val lastName: String,
     @Column(name = "pesel", columnDefinition = "varchar(11)", nullable = true, unique = true)
-    var pesel: String? = null
-
+    val pesel: String? = null,
     @Column(name = "address1", columnDefinition = "varchar(100)", nullable = false)
-    var address1: String? = null
-
+    val address1: String,
     @Column(name = "address2", columnDefinition = "varchar(100)", nullable = true)
-    var address2: String? = null
-
+    val address2: String? = null,
     @Column(name = "city", columnDefinition = "varchar(100)", nullable = false)
-    var city: String? = null
-
+    val city: String,
     @Column(name = "zipCode", columnDefinition = "varchar(20)", nullable = false)
-    var zipCode: String? = null
-
+    val zipCode: String,
     @Column(name = "phone", columnDefinition = "varchar(20)", nullable = false)
-    var phone: String? = null
-
+    val phone: String,
     @Column(name = "birth", columnDefinition = "DATE", nullable = false)
-    var birth: LocalDate? = null
-
+    val birth: LocalDate,
     @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
-    var examinations: Set<Examination> = HashSet()
+    val examinations: Set<Examination> = mutableSetOf()
+) {
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+        other as Patient
+
+        return id != null && id == other.id
+    }
+
+    override fun hashCode(): Int = javaClass.hashCode()
+
+    override fun toString(): String = """
+        Patient(firstName='$firstName', 
+                lastName='$lastName', 
+                pesel=$pesel, 
+                address1='$address1', 
+                address2=$address2, 
+                city='$city', 
+                zipCode='$zipCode', 
+                phone='$phone', 
+                birth=$birth, 
+                examinations=$examinations)
+    """.trimIndent()
 
 }

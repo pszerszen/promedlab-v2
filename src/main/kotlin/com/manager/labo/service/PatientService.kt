@@ -32,39 +32,41 @@ class PatientService(@Autowired val patientRepository: PatientRepository) {
 
     fun getById(id: Long): PatientModel? = convert(get(id))
 
-    val all: List<PatientModel?> get() = patientRepository.findAll().mapNotNull { this.convert(it) }
+    val all: List<PatientModel> get() = patientRepository.findAll().mapNotNull { this.convert(it) }
 
 
     private fun convert(patient: Patient?): PatientModel? {
-        if (patient == null) {
-            return null
+        return when (patient) {
+            null -> {
+                null
+            }
+            else -> PatientModel(
+                patient.id,
+                patient.pesel,
+                DateUtils.fromDate(patient.birth),
+                patient.lastName,
+                patient.firstName,
+                patient.address1,
+                patient.address2,
+                patient.phone,
+                patient.zipCode,
+                patient.city)
         }
-        val model = PatientModel()
-        model.id = patient.id
-        model.pesel = patient.pesel
-        model.birthDay = patient.birth?.let { DateUtils.fromDate(it) }
-        model.lastName = patient.lastName
-        model.firstName = patient.firstName
-        model.address1 = patient.address1
-        model.address2 = patient.address2
-        model.phone = patient.phone
-        model.zipCode = patient.zipCode
-        model.city = patient.city
-        return model
     }
 
     private fun convert(model: PatientModel): Patient {
-        val patient = Patient()
-        patient.id = model.id
-        patient.pesel = model.pesel
-        patient.birth = model.birthDay?.let { DateUtils.toDate(it) }
-        patient.lastName = model.lastName
-        patient.firstName = model.firstName
-        patient.address1 = model.address1
-        patient.address2 = model.address2
-        patient.phone = model.phone
-        patient.zipCode = model.zipCode
-        patient.city = model.city
-        return patient
+        return Patient(
+            model.id,
+            model.firstName!!,
+            model.lastName!!,
+            model.pesel,
+            model.address1!!,
+            model.address2,
+            model.city!!,
+            model.zipCode!!,
+            model.phone!!,
+            DateUtils.toDate(model.birthDay!!),
+            emptySet()
+        )
     }
 }

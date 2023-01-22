@@ -24,6 +24,8 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.util.*
 import java.util.function.Consumer
+import javax.validation.constraints.NotNull
+import javax.validation.constraints.Pattern
 
 /**
  * @author pszerszen
@@ -113,15 +115,15 @@ class ExaminationService(
     }
 
     private fun validateField(field: Field, fieldValue: String): String? {
-        val notNullAnno: NotNull = field.getAnnotation(NotNull::class.java)
+        val notNullAnno: NotNull? = field.getAnnotation(NotNull::class.java)
         if (notNullAnno != null && StringUtils.isBlank(fieldValue)) {
-            return notNullAnno.message()
+            return notNullAnno.message
         }
-        val patternAnno: Pattern = field.getAnnotation(Pattern::class.java)
-        if (patternAnno != null && !fieldValue.matches(patternAnno.regexp().toRegex())) {
-            return patternAnno.message()
+        val patternAnno: Pattern? = field.getAnnotation(Pattern::class.java)
+        if (patternAnno != null && !fieldValue.matches(patternAnno.regexp.toRegex())) {
+            return patternAnno.message
         }
-        val validDateAnno: ValidDate = field.getAnnotation<ValidDate>(ValidDate::class.java)
+        val validDateAnno: ValidDate? = field.getAnnotation(ValidDate::class.java)
         if (validDateAnno != null) {
             try {
                 LocalDate.parse(fieldValue, DateTimeFormatter.ofPattern(validDateAnno.dateFormat))
@@ -145,8 +147,8 @@ class ExaminationService(
         patient.pesel = model.pesel
         patient.birth = DateUtils.toDate(model.birthDay!!)
         patient.address1 = model.address1
-        patient.address2 = when(val it = model.address2) {
-           "" -> null
+        patient.address2 = when (val it = model.address2) {
+            "" -> null
             else -> it
         }
         patient.zipCode = model.zipCode
@@ -181,21 +183,18 @@ class ExaminationService(
         return examination
     }
 
-    private fun map(examination: Examination): ExaminationRequestModel {
-        val model = ExaminationRequestModel()
-        val patient: Patient? = examination.patient
-        val examinationDetailses = examination.examinationDetails
-        model.examinationId = examination.id
-        model.pesel = patient?.pesel
-        model.birthDay = DateUtils.fromDate(patient?.birth!!)
-        model.firstName = patient?.firstName
-        model.lastName = patient?.lastName
-        model.address1 = patient?.address1
-        model.address2 = patient?.address2
-        model.city = patient?.city
-        model.zipCode = patient?.zipCode
-        model.phone = patient?.phone
-        model.examinations = examinationDetailses
+    private fun map(examination: Examination): ExaminationRequestModel = ExaminationRequestModel(
+        examination.id,
+        examination.patient.firstName,
+        examination.patient.lastName,
+        examination.patient.pesel,
+        DateUtils.fromDate(examination.patient.birth),
+        examination.patient.address1,
+        examination.patient.address2,
+        examination.patient.zipCode,
+        examination.patient.city,
+        examination.patient.phone,
+        examination.examinationDetails
             .map {
                 val summaryModel = ExaminationSummaryModel()
                 val code = it.code
@@ -207,25 +206,21 @@ class ExaminationService(
                 summaryModel
             }
             .toMutableList()
-        return model
-    }
+    )
 
-    private fun mapToExaminationModel(examination: Examination): ExaminationModel {
-        val model = ExaminationModel()
-        model.id = examination.id
-        model.code = examination.code
-        model.requestDate = DateUtils.fromDateTime(examination.date!!)
-        val patient: Patient? = examination.patient
-        model.pesel = patient?.pesel
-        model.firstName = patient?.firstName
-        model.lastName = patient?.lastName
-        model.address = StringJoiner(" ")
-            .add(patient?.address1)
-            .add(patient?.address2)
-            .toString()
-        model.phone = patient?.phone
-        return model
-    }
+    private fun mapToExaminationModel(examination: Examination): ExaminationModel = ExaminationModel(
+        examination.id,
+        DateUtils.fromDateTime(examination.date),
+        examination.code,
+        examination.patient.pesel,
+        examination.patient.lastName,
+        examination.patient.firstName,
+        StringJoiner(" ")
+            .add(examination.patient.address1)
+            .add(examination.patient.address2)
+            .toString(),
+        examination.patient.phone
+    )
 
     companion object {
         private val log = LoggerFactory.getLogger(ExaminationService::class.java)

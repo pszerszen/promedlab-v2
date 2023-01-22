@@ -1,26 +1,39 @@
 package com.manager.labo.entities
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Table
-import org.apache.commons.lang3.builder.ToStringBuilder
+import jakarta.persistence.*
+import org.hibernate.Hibernate
 
 /**
  * @author Piotr
  */
 @Entity
 @Table(name = "icd")
-class Icd : AbstractEntity() {
+data class Icd(
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    val id: Long? = null,
+    
     @Column(name = "code1", columnDefinition = "varchar(1)", nullable = false)
-    var code1: String? = null
-
+    val code1: String,
     @Column(name = "name1", columnDefinition = "varchar(200)", nullable = false)
-    var name1: String? = null
-
+    val name1: String,
     @Column(name = "code2", columnDefinition = "varchar(3)", nullable = false)
-    var code2: String? = null
-
+    val code2: String,
     @Column(name = "name2", columnDefinition = "longtext", nullable = false)
-    var name2: String? = null
+    val name2: String
+) {
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+        other as Icd
+
+        return id != null && id == other.id
+    }
+
+    override fun hashCode(): Int = javaClass.hashCode()
+
+    override fun toString(): String = "Icd(code1='$code1', name1='$name1', code2='$code2', name2='$name2')"
 
 }

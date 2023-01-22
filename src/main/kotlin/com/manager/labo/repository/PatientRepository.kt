@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface PatientRepository: JpaRepository<Patient, Long> {
 
-    fun getByPesel(pesel: String): Patient?
+    fun getByPesel(pesel: String): Patient
 }

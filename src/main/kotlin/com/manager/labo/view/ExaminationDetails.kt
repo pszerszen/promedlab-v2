@@ -4,13 +4,12 @@ import com.manager.labo.model.ExaminationRequestModel
 import com.manager.labo.model.ExaminationSummaryModel
 import com.manager.labo.model.PatientModel
 import com.manager.labo.utils.*
-import com.manager.labo.view.ExaminationDetails.TriConsumer
 import com.manager.labo.view.components.JPanelEnchancer
 import com.manager.labo.view.components.LaboTableModel
 import com.manager.labo.view.components.TableModelName
+import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
-import java.awt.event.ActionListener
 import java.lang.reflect.Field
 import java.util.*
 import javax.swing.*
@@ -198,7 +197,7 @@ class ExaminationDetails @JvmOverloads constructor(model: ExaminationRequestMode
         addExaminationValue.setBounds(10, 173, 210, 23)
         addExaminationValue.addActionListener {
             for (row in table.selectedRows) {
-                model.examinations.get(row).setStaffNameAndValue(examiner.text, examinationValue.value as Int)
+                model?.examinations?.get(row)?.setStaffNameAndValue(examiner.text, examinationValue.value as Int)
             }
             mountValuesFromModel()
         }
@@ -224,7 +223,7 @@ class ExaminationDetails @JvmOverloads constructor(model: ExaminationRequestMode
     }
 
     fun loadValuesToModel() {
-        mappingOperation(model, { model: Any, field: Field, component: JTextComponent -> setUpModelValues(model, field, component) })
+        mappingOperation(model) { model: Any, field: Field, component: JTextComponent -> setUpModelValues(model, field, component) }
         model.examinations.clear()
         model.examinations.addAll(examinationTableModel.modelList)
     }
@@ -266,9 +265,7 @@ class ExaminationDetails @JvmOverloads constructor(model: ExaminationRequestMode
     }
 
     fun mountValuesFromModel(model: Any) {
-        mappingOperation(
-            model,
-            { model: Any, field: Field, component: JTextComponent -> setUpSwingComponentValues(model, field, component) })
+        mappingOperation(model) { model: Any, field: Field, component: JTextComponent -> setUpSwingComponentValues(model, field, component) }
     }
 
     fun enableExaminationGroup(enable: Boolean) {
@@ -282,9 +279,7 @@ class ExaminationDetails @JvmOverloads constructor(model: ExaminationRequestMode
     }
 
     private fun mountValuesFromModel() {
-        mappingOperation(
-            model,
-            { model: Any, field: Field, component: JTextComponent -> setUpSwingComponentValues(model, field, component) })
+        mappingOperation(model) { model: Any, field: Field, component: JTextComponent -> setUpSwingComponentValues(model, field, component) }
         examinationTableModel.setNumRows(0)
         examinationTableModel.addRows(model.examinations)
     }
@@ -292,13 +287,10 @@ class ExaminationDetails @JvmOverloads constructor(model: ExaminationRequestMode
     private fun mappingOperation(model: Any, consumer: TriConsumer) {
         try {
             for (field in model.javaClass.declaredFields) {
-                val mappingField: MappingField = field.getAnnotation<MappingField>(MappingField::class.java)
+                val mappingField: MappingField? = field.getAnnotation(MappingField::class.java)
                 if (mappingField != null) {
-                    val mappingName: String = Optional
-                        .ofNullable(
-                            Strings.emptyToNull(
-                                mappingField.value.trim { it <= ' ' })
-                        )
+                    val mappingName: String = Optional.of(mappingField.value.trim { it <= ' ' })
+                        .filter { StringUtils.isNotBlank(it) }
                         .orElse(field.name)
                     field.isAccessible = true
                     val swingField = this.javaClass.getDeclaredField(mappingName)
@@ -307,43 +299,43 @@ class ExaminationDetails @JvmOverloads constructor(model: ExaminationRequestMode
                 }
             }
         } catch (e: SecurityException) {
-            LOGGER.error("Error during mapping values with UI.", e)
+            log.error("Error during mapping values with UI.", e)
         } catch (e: IllegalArgumentException) {
-            LOGGER.error("Error during mapping values with UI.", e)
+            log.error("Error during mapping values with UI.", e)
         } catch (e: IllegalAccessException) {
-            LOGGER.error("Error during mapping values with UI.", e)
+            log.error("Error during mapping values with UI.", e)
         } catch (e: NoSuchFieldException) {
-            LOGGER.error("Error during mapping values with UI.", e)
+            log.error("Error during mapping values with UI.", e)
         }
     }
 
-    private fun setUpModelValues(model: Any, field: Field, component: JTextComponent) {
-        try {
-            field[model] = component.text
-        } catch (e: IllegalArgumentException) {
-            e.printStackTrace()
-        } catch (e: IllegalAccessException) {
-            e.printStackTrace()
+        private fun setUpModelValues(model: Any, field: Field, component: JTextComponent) {
+            try {
+                field[model] = component.text
+            } catch (e: IllegalArgumentException) {
+                e.printStackTrace()
+            } catch (e: IllegalAccessException) {
+                e.printStackTrace()
+            }
+        }
+
+        private fun setUpSwingComponentValues(model: Any, field: Field, component: JTextComponent) {
+            val `object`: Any?
+            try {
+                `object` = field[model]
+                component.text = `object`?.toString() ?: ""
+            } catch (e: IllegalArgumentException) {
+                e.printStackTrace()
+            } catch (e: IllegalAccessException) {
+                e.printStackTrace()
+            }
+        }
+
+        private fun interface TriConsumer {
+            fun accept(model: Any, field: Field, component: JTextComponent)
+        }
+
+        companion object {
+            private val log = LoggerFactory.getLogger(ExaminationDetails::class.java)
         }
     }
-
-    private fun setUpSwingComponentValues(model: Any, field: Field, component: JTextComponent) {
-        val `object`: Any?
-        try {
-            `object` = field[model]
-            component.text = `object`?.toString() ?: ""
-        } catch (e: IllegalArgumentException) {
-            e.printStackTrace()
-        } catch (e: IllegalAccessException) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun interface TriConsumer {
-        fun accept(model: Any, field: Field, component: JTextComponent)
-    }
-
-    companion object {
-        private val LOGGER = LoggerFactory.getLogger(ExaminationDetails::class.java)
-    }
-}

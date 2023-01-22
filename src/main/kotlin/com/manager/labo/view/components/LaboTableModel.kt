@@ -41,11 +41,9 @@ class LaboTableModel<M : Any>(private val name: TableModelName, vararg columns: 
         return rows.map { getRowAsModel(it) }
     }
 
-    val modelList: List<M?>
+    val modelList: List<M>
         get() {
-            val list: MutableList<M?> = ArrayList()
-            (0 until modelTable.size).mapTo(list) { modelTable[it] }
-            return list
+            return modelTable.values.toList()
         }
 
     fun addRow(model: M) {

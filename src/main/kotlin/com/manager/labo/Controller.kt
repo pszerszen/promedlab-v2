@@ -22,7 +22,6 @@ import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.WindowEvent
 import java.awt.event.WindowListener
-import java.util.function.IntFunction
 import javax.swing.*
 
 class Controller : JFrame("PRO-LAB-MANAGER"), ActionListener, WindowListener {
@@ -52,14 +51,14 @@ class Controller : JFrame("PRO-LAB-MANAGER"), ActionListener, WindowListener {
                 val currentModel: PatientModel? = patientList?.currentModel
                 if (currentModel != null) {
                     examinationDetails = ExaminationDetails()
-                    val patientModel: PatientModel? = patientService.getById(currentModel?.id)
-                    examinationDetails!!.mountValuesFromModel(patientModel)
+                    val patientModel: PatientModel? = patientService.getById(currentModel.id!!)
+                    examinationDetails!!.mountValuesFromModel(patientModel!!)
                     setExaminationDetailsActions()
                 }
             }
 
             "Examination-See" -> {
-                val currentModel2: ExaminationModel? = examinationList.currentModel
+                val currentModel2: ExaminationModel? = examinationList?.currentModel
                 if (currentModel2 != null) {
                     val examinationModel: ExaminationRequestModel = examinationService
                         .getExaminationRequestModel(currentModel2.id)
@@ -69,8 +68,8 @@ class Controller : JFrame("PRO-LAB-MANAGER"), ActionListener, WindowListener {
             }
 
            BACK -> setMainPanel()
-            "Patient-Reload" -> patientList.reloadTable(patientService.all)
-            "Examination-Reload" -> examinationList.reloadTable(examinationService.all)
+            "Patient-Reload" -> patientList?.reloadTable(patientService.all)
+            "Examination-Reload" -> examinationList?.reloadTable(examinationService.all)
         }
     }
 
@@ -85,7 +84,7 @@ class Controller : JFrame("PRO-LAB-MANAGER"), ActionListener, WindowListener {
                 .addAction(PATIENT_LIST) { setPatientList() }
                 .addAction(EXAMINATION_LIST) { setExaminationList() }
         }
-        setCurrentPanel(mainPanel)
+        setCurrentPanel(mainPanel!!)
     }
 
     private fun setPatientList() {
@@ -95,7 +94,7 @@ class Controller : JFrame("PRO-LAB-MANAGER"), ActionListener, WindowListener {
                 .addListeners(this, null)
         }
         patientList?.reloadTable(patientService.all)
-        setCurrentPanel(patientList)
+        setCurrentPanel(patientList!!)
     }
 
     private fun setExaminationList() {
@@ -105,7 +104,7 @@ class Controller : JFrame("PRO-LAB-MANAGER"), ActionListener, WindowListener {
                 .addListeners(this, null)
         }
         examinationList?.reloadTable(examinationService.all)
-        setCurrentPanel(examinationList)
+        setCurrentPanel(examinationList!!)
     }
 
     private fun setExaminationDetailsActions() {
@@ -149,7 +148,7 @@ class Controller : JFrame("PRO-LAB-MANAGER"), ActionListener, WindowListener {
                         errors = examinationService.validate(model, !newExamination)
                         if (CollectionUtils.isNotEmpty(errors)) {
                             val panel = JPanel()
-                            panel.add(JList<String>(errors.toArray(Array<String>(errors.size))))
+                            panel.add(JList(errors.toTypedArray()))
                             JOptionPane.showMessageDialog(this, panel, "Błędy walidacji.", JOptionPane.ERROR_MESSAGE)
                         }
                     } catch (ex: Exception) {
@@ -165,12 +164,12 @@ class Controller : JFrame("PRO-LAB-MANAGER"), ActionListener, WindowListener {
                     }
                 }
         }
-        setCurrentPanel(examinationDetails)
+        setCurrentPanel(examinationDetails!!)
     }
 
-    private fun setCurrentPanel(jPanel: JPanel?) {
+    private fun setCurrentPanel(jPanel: JPanel) {
         contentPane = jPanel
-        setSize(jPanel.getWidth() + 50, jPanel.getHeight() + 50)
+        setSize(jPanel.width + 50, jPanel.height + 50)
     }
 
     override fun windowOpened(e: WindowEvent) {}

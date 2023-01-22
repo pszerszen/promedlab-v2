@@ -26,4 +26,27 @@ class ExaminationModel {
 
     @DisplayInJTable(TableModelName.REQUESTS, 6)
     var phone: String? = null
+
+    constructor()
+
+    constructor(
+        id: Long?,
+        requestDate: String?,
+        code: String?,
+        pesel: String?,
+        lastName: String?,
+        firstName: String?,
+        address: String?,
+        phone: String?
+    ) {
+        this.id = id
+        this.requestDate = requestDate
+        this.code = code
+        this.pesel = pesel
+        this.lastName = lastName
+        this.firstName = firstName
+        this.address = address
+        this.phone = phone
+    }
+
 }
