@@ -123,39 +123,55 @@ class ExaminationService(
     private fun map(model: ExaminationRequestModel): Examination {
         val id: Long? = model.examinationId
         val newExamination = id == null
-        val examination: Examination = if (newExamination) Examination() else examinationRepository.findByIdOrNull(id)!!
         var patient: Patient? = patientRepository.getByPesel(model.pesel!!)
         if (patient == null) {
-            patient = Patient()
+            patient = Patient(null,
+                model.firstName!!,
+                model.lastName!!,
+                model.pesel,
+                model.address1!!,
+                when (val it = model.address2) {
+                    "" -> null
+                    else -> it
+                },
+                model.city!!,
+                model.zipCode!!,
+                model.phone!!,
+                DateUtils.toDate(model.birthDay!!),
+                mutableSetOf())
+        } else {
+            patient = patient.copy(
+                firstName = model.firstName!!,
+                lastName = model.lastName!!,
+                pesel = model.pesel,
+                address1 = model.address1!!,
+                address2 = when (val it = model.address2) {
+                    "" -> null
+                    else -> it
+                },
+                city = model.city!!,
+                zipCode = model.zipCode!!,
+                birth = DateUtils.toDate(model.birthDay!!))
         }
-        patient.firstName = model.firstName
-        patient.lastName = model.lastName
-        patient.pesel = model.pesel
-        patient.birth = DateUtils.toDate(model.birthDay!!)
-        patient.address1 = model.address1
-        patient.address2 = when (val it = model.address2) {
-            "" -> null
-            else -> it
-        }
-        patient.zipCode = model.zipCode
-        patient.city = model.city
-        patient.phone = model.phone
-        examination.patient = patient
-        val examinationDetailses: MutableSet<ExaminationDetails> = examination.examinationDetails
-        val examinations: List<ExaminationSummaryModel> = model.examinations
+        val modelExaminations = model.examinations
 
+        var examination: Examination = if (newExamination) Examination(null, patient, LocalDateTime.now(), modelExaminations[0].code?.substring(0, 1)!!, mutableSetOf()) else examinationRepository.findByIdOrNull(id)!!
+
+        val examinationDetailses = examination.examinationDetails
         // creating new examination request
         if (newExamination) {
-            examination.date = LocalDateTime.now()
-            examination.code = examinations[0].code?.substring(0, 1)
+            examination = examination.copy(
+                date = LocalDateTime.now(),
+                code = modelExaminations[0].code?.substring(0, 1)!!)
         }
-        examinations.forEach(Consumer {
+        modelExaminations.forEach(Consumer {
             if (newExamination) {
                 examinationDetailses.add(ExaminationDetails(null, examination, it.code!!, null, null, LocalDateTime.now()))
             } else {
                 val detail = examinationDetailses
                     .first { d: ExaminationDetails -> d.code == it.code }
                     .copy(staffName = it.staffName, value = it.value)
+                examinationDetailses.add(detail)
             }
         })
         return examination
