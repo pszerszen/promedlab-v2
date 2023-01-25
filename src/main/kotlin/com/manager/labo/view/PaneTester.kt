@@ -40,7 +40,7 @@ class PaneTester() : JFrame(), ActionListener, KeyListener {
 
     companion object {
         @JvmStatic
-        fun main(args: Array<String>) {
+        fun mainn(args: Array<String>) {
             val model = ExaminationRequestModel()
             model.address1 = "address1"
             model.address2 = "address2"

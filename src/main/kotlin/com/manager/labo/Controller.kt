@@ -16,29 +16,30 @@ import com.manager.labo.view.PatientList
 import com.manager.labo.view.components.JPanelEnchancer
 import org.apache.commons.collections4.CollectionUtils
 import org.slf4j.LoggerFactory
+import org.springframework.boot.SpringApplication
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.support.ClassPathXmlApplicationContext
+import org.springframework.stereotype.Service
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.WindowEvent
 import java.awt.event.WindowListener
 import javax.swing.*
+import kotlin.system.exitProcess
 
-class Controller : JFrame("PRO-LAB-MANAGER"), ActionListener, WindowListener {
+@Service
+class Controller(
+    private val icdService: IcdService,
+    private val patientService: PatientService,
+    private val examinationService: ExaminationService
+) : JFrame("PRO-LAB-MANAGER"), ActionListener, WindowListener {
     private var mainPanel: MainPanel? = null
     private var examinationList: ExaminationList? = null
     private var patientList: PatientList? = null
     private var examinationDetails: ExaminationDetails? = null
-    private val icdService: IcdService
-    private val patientService: PatientService
-    private val examinationService: ExaminationService
-    private val context: ConfigurableApplicationContext
+
 
     init {
-        context = ClassPathXmlApplicationContext("applicationContext.xml")
-        icdService = context.getBean(IcdService::class.java)
-        patientService = context.getBean(PatientService::class.java)
-        examinationService = context.getBean(ExaminationService::class.java)
         setMainPanel()
         defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
         isVisible = true
@@ -67,7 +68,7 @@ class Controller : JFrame("PRO-LAB-MANAGER"), ActionListener, WindowListener {
                 }
             }
 
-           BACK -> setMainPanel()
+            BACK -> setMainPanel()
             "Patient-Reload" -> patientList?.reloadTable(patientService.all)
             "Examination-Reload" -> examinationList?.reloadTable(examinationService.all)
         }
@@ -174,10 +175,9 @@ class Controller : JFrame("PRO-LAB-MANAGER"), ActionListener, WindowListener {
 
     override fun windowOpened(e: WindowEvent) {}
     override fun windowClosing(e: WindowEvent) {
-        context.close()
-        e.getWindow().dispose()
+        e.window.dispose()
         this.dispose()
-        System.exit(WindowConstants.EXIT_ON_CLOSE)
+        exitProcess(EXIT_ON_CLOSE)
     }
 
     override fun windowClosed(e: WindowEvent) {}
@@ -188,9 +188,5 @@ class Controller : JFrame("PRO-LAB-MANAGER"), ActionListener, WindowListener {
 
     companion object {
         private val log = LoggerFactory.getLogger(Controller::class.java)
-        @JvmStatic
-        fun main(args: Array<String>) {
-            Controller()
-        }
     }
 }
