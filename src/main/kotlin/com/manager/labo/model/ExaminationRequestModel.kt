@@ -7,7 +7,6 @@ import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 
 class ExaminationRequestModel {
-
     var examinationId: Long? = null
 
     @MappingField
@@ -53,6 +52,7 @@ class ExaminationRequestModel {
     var examinations: MutableList<ExaminationSummaryModel> = mutableListOf()
 
     constructor()
+
     constructor(
         examinationId: Long?,
         firstName: String?,
@@ -79,6 +79,9 @@ class ExaminationRequestModel {
         this.examinations = examinations
     }
 
+    fun addExamination(examinationSummaryModel: ExaminationSummaryModel) {
+        examinations.add(examinationSummaryModel)
+    }
 
     companion object {
         private const val ZŁY_FORMAT_TELEFONU = "Zły format telefonu."

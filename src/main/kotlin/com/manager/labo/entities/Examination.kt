@@ -15,7 +15,7 @@ data class Examination(
     @GeneratedValue(strategy = GenerationType.AUTO)
     val id: Long? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH])
     @JoinColumn(name = "patientId", nullable = false)
     val patient: Patient,
     @Column(name = "date", columnDefinition = "DATETIME", nullable = false)
