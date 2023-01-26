@@ -10,12 +10,7 @@ import java.util.function.Consumer
 import java.util.stream.Stream
 import javax.swing.*
 
-class JPanelEnchancer(panel: JPanel) {
-    private val panel: JPanel
-
-    init {
-        this.panel = panel
-    }
+class JPanelEnchancer(private val panel: JPanel) {
 
     fun addAction(actionCommand: String, actionListener: ActionListener?): JPanelEnchancer {
         try {
@@ -71,18 +66,14 @@ class JPanelEnchancer(panel: JPanel) {
         return this
     }
 
-    private fun <C : JComponent?> standardActionsForComponent(type: Class<C>?, action: Consumer<C>): JPanelEnchancer {
+    private fun <C : JComponent?> standardActionsForComponent(type: Class<C>, action: Consumer<C>): JPanelEnchancer {
         Stream.of(panel.javaClass.superclass.declaredFields, panel.javaClass.declaredFields)
             .flatMap { Arrays.stream(it) }
             .filter { it.type == type }
-            .forEach {
-                try {
-                    it.isAccessible = true
-                    action.accept(it.get(panel) as C)
-                } catch (e: Exception) {
-                    log.error("Error...", e)
-                }
-            }
+            .peek { it.isAccessible = true }
+            .map { it.get(panel) }
+            .map { type.cast(it) }
+            .forEach { action.accept(it) }
         return this
     }
 
