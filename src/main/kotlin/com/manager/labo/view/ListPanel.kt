@@ -35,14 +35,14 @@ abstract class ListPanel<T: Any> : JPanel() {
         action.actionCommand = typePrefix + SEE
         this.add(action)
         reload = JButton("Przeładuj")
-        reload.icon = ImageIcon(ListPanel::class.java.getResource("/com/sun/javafx/scene/web/skin/Redo_16x16_JFX.png"))
+        reload.icon = ImageIcon(javaClass.classLoader.getResource("assets/redo.png"))
         reload.background = Color(255, 0, 0)
         reload.setBounds(851, 513, 139, 57)
         reload.actionCommand = typePrefix + RELOAD
         this.add(reload)
         back = JButton("Wróć")
         back.background = Color(0, 153, 255)
-        back.icon = ImageIcon(ListPanel::class.java.getResource("/com/sun/javafx/scene/web/skin/Undo_16x16_JFX.png"))
+        back.icon = ImageIcon(javaClass.classLoader.getResource("assets/undo.png"))
         back.setBounds(10, 513, 89, 57)
         back.actionCommand = BACK
         this.add(back)
