@@ -19,17 +19,17 @@ class JPanelEnchancer(panel: JPanel) {
 
     fun addAction(actionCommand: String, actionListener: ActionListener?): JPanelEnchancer {
         try {
-            for (field in panel.javaClass.declaredFields) {
-                val actionCommandAnnotation: ActionCommand = field.getAnnotation(ActionCommand::class.java)
-                if (actionCommand == actionCommandAnnotation.value) {
-                    field.isAccessible = true
-                    when (val obj = field[panel]) {
+            panel.javaClass.declaredFields
+                .filter { it.isAnnotationPresent(ActionCommand::class.java) }
+                .filter { it.getAnnotation(ActionCommand::class.java).value == actionCommand }
+                .forEach {
+                    it.isAccessible = true
+                    when (val obj = it[panel]) {
                         is JButton -> obj.addActionListener(actionListener)
                         is JComboBox<*> -> obj.addActionListener(actionListener)
-                        else -> log.error("Cannot add ActionListener to field {} of type {}", field.name, obj.javaClass.canonicalName)
+                        else -> log.error("Cannot add ActionListener to field {} of type {}", it.name, obj.javaClass.canonicalName)
                     }
                 }
-            }
         } catch (e: IllegalArgumentException) {
             log.error("Error while attaching action:", e)
         } catch (e: IllegalAccessException) {
@@ -41,13 +41,15 @@ class JPanelEnchancer(panel: JPanel) {
     fun initButtonsActionCommands(): JPanelEnchancer {
         panel.javaClass.declaredFields
             .filter { it.type == JButton::class.java && it.isAnnotationPresent(ActionCommand::class.java) }
-            .forEach { try {
-                it.isAccessible = true
-                val button: JButton = it[panel] as JButton
-                button.actionCommand = it.getAnnotation(ActionCommand::class.java).value
-            } catch (e: Exception) {
-                log.error("Error...", e)
-            } }
+            .forEach {
+                try {
+                    it.isAccessible = true
+                    val button: JButton = it[panel] as JButton
+                    button.actionCommand = it.getAnnotation(ActionCommand::class.java).value
+                } catch (e: Exception) {
+                    log.error("Error...", e)
+                }
+            }
         return this
     }
 
@@ -61,15 +63,15 @@ class JPanelEnchancer(panel: JPanel) {
 
     fun standardActions(): JPanelEnchancer {
         standardActionsForComponent(JButton::class.java) {
-            it.font = helveticaPlain14
+            it.font = arialPlain14
             it.isFocusable = false
         }
-        standardActionsForComponent(JLabel::class.java) { it.font = helveticaPlain14 }
+        standardActionsForComponent(JLabel::class.java) { it.font = arialPlain14 }
         initButtonsActionCommands()
         return this
     }
 
-    fun <C : JComponent?> standardActionsForComponent(type: Class<C>?, action: Consumer<C>): JPanelEnchancer {
+    private fun <C : JComponent?> standardActionsForComponent(type: Class<C>?, action: Consumer<C>): JPanelEnchancer {
         Stream.of(panel.javaClass.superclass.declaredFields, panel.javaClass.declaredFields)
             .flatMap { Arrays.stream(it) }
             .filter { it.type == type }
@@ -86,6 +88,6 @@ class JPanelEnchancer(panel: JPanel) {
 
     companion object {
         private val log = LoggerFactory.getLogger(JPanelEnchancer::class.java)
-        private val helveticaPlain14 = Font("Helvetica", Font.PLAIN, 14)
+        private val arialPlain14 = Font("Arial", Font.PLAIN, 14)
     }
 }
