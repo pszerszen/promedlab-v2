@@ -26,7 +26,7 @@ class PatientService(@Autowired val patientRepository: PatientRepository) {
 
     fun get(id: Long): Patient? = patientRepository.findByIdOrNull(id)
 
-    fun getByPesel(pesel: String): Patient = patientRepository.getByPesel(pesel)
+    fun getByPesel(pesel: String): Patient? = patientRepository.getByPesel(pesel)
 
     fun getPatientModelByPesel(pesel: String): PatientModel? = convert(getByPesel(pesel))
 
