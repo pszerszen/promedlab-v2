@@ -16,9 +16,6 @@ import com.manager.labo.view.PatientList
 import com.manager.labo.view.components.JPanelEnchancer
 import org.apache.commons.collections4.CollectionUtils
 import org.slf4j.LoggerFactory
-import org.springframework.boot.SpringApplication
-import org.springframework.context.ConfigurableApplicationContext
-import org.springframework.context.support.ClassPathXmlApplicationContext
 import org.springframework.stereotype.Service
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
