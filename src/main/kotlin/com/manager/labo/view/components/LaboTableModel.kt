@@ -5,20 +5,15 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Consumer
 import javax.swing.table.DefaultTableModel
 
-class LaboTableModel<M : Any>(private val name: TableModelName, vararg columns: String?) : DefaultTableModel(columns, 0) {
-    private val modelTable: MutableMap<Int, M>
+class LaboTableModel<M : Any>(
+    private val name: TableModelName,
+    vararg columns: String?,
+    private val modelTable: MutableMap<Int, M> = ConcurrentHashMap()
+) : DefaultTableModel(columns, 0) {
 
-    init {
-        modelTable = ConcurrentHashMap()
-    }
+    override fun isCellEditable(row: Int, column: Int): Boolean = false
 
-    override fun isCellEditable(row: Int, column: Int): Boolean {
-        return false
-    }
-
-    override fun getColumnClass(columnIndex: Int): Class<String> {
-        return String::class.java
-    }
+    override fun getColumnClass(columnIndex: Int): Class<String> = String::class.java
 
     override fun setRowCount(rowCount: Int) {
         modelTable.forEach { (key: Int, _: M) ->
@@ -33,13 +28,9 @@ class LaboTableModel<M : Any>(private val name: TableModelName, vararg columns: 
         models.forEach(Consumer { model: M -> this.addRow(model) })
     }
 
-    fun getRowAsModel(row: Int): M? {
-        return modelTable[row]
-    }
+    fun getRowAsModel(row: Int): M? = modelTable[row]
 
-    fun getRowsAsModels(vararg rows: Int): List<M?> {
-        return rows.map { getRowAsModel(it) }
-    }
+    fun getRowsAsModels(vararg rows: Int): List<M?> = rows.map { getRowAsModel(it) }
 
     val modelList: List<M>
         get() {
