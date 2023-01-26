@@ -23,7 +23,7 @@
     </createTable>
 
     <createTable tableName="patient">
-      <column computed="false" name="id" type="bigint">
+      <column computed="false" name="id" type="bigint" autoIncrement="true">
         <constraints nullable="false" primaryKey="true" primaryKeyName="PK_patient"/>
       </column>
       <column computed="false" name="firstname" type="varchar(100)">
@@ -54,7 +54,7 @@
     </createTable>
 
     <createTable tableName="examination">
-      <column computed="false" name="id" type="bigint">
+      <column computed="false" name="id" type="bigint" autoIncrement="true">
         <constraints nullable="false" primaryKey="true" primaryKeyName="PK_examination"/>
       </column>
       <!-- many to one -->
@@ -70,7 +70,7 @@
     </createTable>
 
     <createTable tableName="examination_details">
-      <column computed="false" name="id" type="bigint">
+      <column computed="false" name="id" type="bigint" autoIncrement="true">
         <constraints nullable="false" primaryKey="true" primaryKeyName="PK_examination_details"/>
       </column>
       <!-- many to one -->

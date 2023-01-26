@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 data class ExaminationDetails(
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)

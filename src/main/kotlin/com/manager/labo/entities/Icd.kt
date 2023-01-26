@@ -11,7 +11,7 @@ import org.hibernate.Hibernate
 data class Icd(
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
     
     @Column(name = "code1", columnDefinition = "varchar(1)", nullable = false)

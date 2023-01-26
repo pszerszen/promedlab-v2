@@ -10,7 +10,7 @@ import java.time.LocalDate
 data class Patient(
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
     @Column(name = "firstname", columnDefinition = "varchar(100)", nullable = false)
