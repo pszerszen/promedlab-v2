@@ -2,7 +2,7 @@ version: '3.8'
 services:
   promedlab:
     container_name: mysql
-    image: mysql:8.0.31
+    image: mysql:latest
     cap_add:
       - SYS_NICE
     restart: always

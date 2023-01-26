@@ -5,7 +5,7 @@
 
   <changeSet id="1" author="Piotr Szerszeń">
     <createTable tableName="icd">
-      <column computed="false" name="id" type="bigint" autoIncrement="true" defaultValueNumeric="">
+      <column computed="false" name="id" type="bigint" autoIncrement="true">
         <constraints nullable="false" primaryKey="true" primaryKeyName="PK_icd"/>
       </column>
       <column computed="false" name="code1" type="varchar(1)">
