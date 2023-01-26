@@ -91,7 +91,7 @@ class ExaminationRequestModel {
         private const val BRAK_KODU_POCZTOWEGO = "Brak kodu pocztowego."
         private const val NIE_WPROWADZONO_ADRESU = "Nie wprowadzono adresu."
         private const val NIEPRAWIDŁOWA_DATA = "Nieprawidłowa data."
-        private const val NIEPRAWIDŁOWY_ZAPIS_DATY = "Nieprawidłowy zapis daty (wymagany format: dd-MM-rrrr)"
+        private const val NIEPRAWIDŁOWY_ZAPIS_DATY = "Nieprawidłowy zapis daty (wymagany format: rrrr-MM-dd)"
         private const val BRAK_DATY_URODZENIA = "Brak daty urodzenia."
         private const val NIEPRAWIDŁOWY_FORMAT_NR_PESEL = "Nieprawidłowy format nr PESEL."
         private const val BRAK_NAZWISKA = "Brak nazwiska."
