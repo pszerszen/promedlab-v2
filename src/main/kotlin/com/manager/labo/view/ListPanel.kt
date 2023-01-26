@@ -7,10 +7,12 @@ import java.awt.Color
 import java.awt.Dimension
 import javax.swing.*
 
-abstract class ListPanel<T: Any> : JPanel() {
-    private val table: JTable
+abstract class ListPanel<T : Any>(
+    private val table: JTable = JTable()
+) : JPanel() {
+
     protected var tableModel: LaboTableModel<T>? = null
-    protected var action: JButton
+    private var action: JButton
     private val reload: JButton
     private val back: JButton
 
@@ -19,7 +21,6 @@ abstract class ListPanel<T: Any> : JPanel() {
         minimumSize = Dimension(1000, 570)
         layout = null
         initTableModel()
-        table = JTable()
         table.model = tableModel
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION)
         table.autoResizeMode = JTable.AUTO_RESIZE_ALL_COLUMNS
