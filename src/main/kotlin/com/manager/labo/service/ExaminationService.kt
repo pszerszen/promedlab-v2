@@ -3,29 +3,19 @@ package com.manager.labo.service
 import com.manager.labo.entities.Examination
 import com.manager.labo.entities.ExaminationDetails
 import com.manager.labo.entities.Patient
+import com.manager.labo.mapper.ExaminationDetailsMapper
+import com.manager.labo.mapper.ExaminationMapper
 import com.manager.labo.model.ExaminationModel
 import com.manager.labo.model.ExaminationRequestModel
 import com.manager.labo.model.ExaminationSummaryModel
 import com.manager.labo.repository.ExaminationDetailsRepository
 import com.manager.labo.repository.ExaminationRepository
 import com.manager.labo.repository.PatientRepository
-import com.manager.labo.utils.DateUtils
-import com.manager.labo.utils.ValidDate
-import org.apache.commons.collections4.CollectionUtils
-import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.lang.reflect.Field
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
-import java.util.*
 import java.util.function.Consumer
-import javax.validation.constraints.NotNull
-import javax.validation.constraints.Pattern
 
 /**
  * @author pszerszen
@@ -33,28 +23,51 @@ import javax.validation.constraints.Pattern
 @Transactional
 @Service
 class ExaminationService(
-    val examinationRepository: ExaminationRepository,
-    val examinationDetailsRepository: ExaminationDetailsRepository,
-    val patientRepository: PatientRepository,
-    val icdService: IcdService
+    private val examinationRepository: ExaminationRepository,
+    private val examinationDetailsRepository: ExaminationDetailsRepository,
+    private val patientRepository: PatientRepository,
+    private val patientService: PatientService,
+    private val examinationDetailsMapper: ExaminationDetailsMapper,
+    private val examinationMapper: ExaminationMapper,
+    private val icdService: IcdService
 ) {
 
     val all: List<ExaminationModel>
         get() = examinationRepository.findAll()
-            .map { mapToExaminationModel(it) }
+            .map { examinationMapper.toExaminationModel(it) }
 
-    fun getExaminationRequestModel(examinationRequestId: Long): ExaminationRequestModel =
-        map(examinationRepository.getReferenceById(examinationRequestId))
+    fun getExaminationRequestModel(examinationRequestId: Long): ExaminationRequestModel {
+        val examination = examinationRepository.getReferenceById(examinationRequestId)
 
-    fun create(examinationRequestModel: ExaminationRequestModel) {
-        val examination: Examination = map(examinationRequestModel)
-        val patient: Patient = examination.patient
-        patientRepository.save(patient)
+        return examinationMapper.toExaminationRequestModel(examination) {
+            examination.examinationDetails
+                .map { examinationDetailsMapper.toExaminationSummaryModel(it) { code2 -> icdService.getByCode2(code2).name2 } }
+                .toMutableList()
+        }
+    }
 
-        val examinationDetailses: Set<ExaminationDetails> = examination.examinationDetails
+    fun create(model: ExaminationRequestModel) {
+        val patient: Patient = patientService.fromExaminationRequest(model)
+        val examination: Examination = getExamination(model, patient)
+        model.examinations
+            .map { mapExaminationDetails(it, examination, isNewExamination(model)) }
+            .forEach { examinationDetailsRepository.save(it) }
+    }
 
-        examinationRepository.save(examination.copy(patient = patient, examinationDetails = mutableSetOf()))
-        examinationDetailses.forEach { examinationDetailsRepository.save(it) }
+    private fun getExamination(model: ExaminationRequestModel, patient: Patient): Examination {
+        val examination: Examination = if (isNewExamination(model))
+            examinationMapper.fromExaminationRequestModel(model) { patient }
+        else examinationMapper.updateFromExaminationRequestModel(examinationRepository.findByIdOrNull(model.examinationId)!!, model)
+        return examinationRepository.save(examination)
+    }
+
+    private fun mapExaminationDetails(model: ExaminationSummaryModel, examination: Examination, newExamination: Boolean): ExaminationDetails {
+        return if (newExamination)
+            examinationDetailsMapper.fromExaminationSummaryModel(model) { examination }
+        else examinationDetailsMapper.updateFromExaminationSummaryModel(
+            examination.examinationDetails.first { d: ExaminationDetails -> d.code == model.code },
+            model
+        )
     }
 
     fun update(examinationRequestModel: ExaminationRequestModel) {
@@ -65,147 +78,7 @@ class ExaminationService(
         })
     }
 
-    @Throws(IllegalArgumentException::class, IllegalAccessException::class)
-    fun validate(model: ExaminationRequestModel, validateExamiantions: Boolean): Set<String> {
-        val errors: MutableSet<String> = mutableSetOf()
-        for (field in model.javaClass.declaredFields) {
-            extractAndValidateField(field, model, errors)
-        }
-        val examinations: List<ExaminationSummaryModel?> = model.examinations
-        if (CollectionUtils.isEmpty(examinations)) {
-            errors.add("Należy wybrać przynajmniej jedno badanie.")
-        }
-        if (validateExamiantions) {
-            examinations.forEach { examination ->
-                for (field in examination!!.javaClass.declaredFields) {
-                    try {
-                        extractAndValidateField(field, examination, errors)
-                    } catch (e: Exception) {
-                        log.error("Error while validating.", e)
-                    }
-                }
-            }
-        }
-        return errors
-    }
-
-    @Throws(IllegalArgumentException::class, IllegalAccessException::class)
-    private fun extractAndValidateField(field: Field, `object`: Any, errors: MutableSet<String>) {
-        field.isAccessible = true
-        val objectVal = field[`object`]
-        val fieldValue = objectVal?.toString() ?: ""
-        val error = validateField(field, fieldValue)
-        if (error != null) {
-            errors.add(error)
-        }
-    }
-
-    private fun validateField(field: Field, fieldValue: String): String? {
-        val notNullAnno: NotNull? = field.getAnnotation(NotNull::class.java)
-        if (notNullAnno != null && StringUtils.isBlank(fieldValue)) {
-            return notNullAnno.message
-        }
-        val patternAnno: Pattern? = field.getAnnotation(Pattern::class.java)
-        if (patternAnno != null && !fieldValue.matches(patternAnno.regexp.toRegex())) {
-            return patternAnno.message
-        }
-        val validDateAnno: ValidDate? = field.getAnnotation(ValidDate::class.java)
-        if (validDateAnno != null) {
-            try {
-                LocalDate.parse(fieldValue, DateTimeFormatter.ofPattern(validDateAnno.dateFormat))
-            } catch (e: DateTimeParseException) {
-                return validDateAnno.message
-            }
-        }
-        return null
-    }
-
-    private fun map(model: ExaminationRequestModel): Examination {
-        val id: Long? = model.examinationId
-        val newExamination = id == null
-        var patient: Patient? = patientRepository.getByPesel(model.pesel!!)
-        if (patient == null) {
-            patient = Patient(null,
-                model.firstName!!,
-                model.lastName!!,
-                model.pesel,
-                model.address1!!,
-                when (val it = model.address2) {
-                    "" -> null
-                    else -> it
-                },
-                model.city!!,
-                model.zipCode!!,
-                model.phone!!,
-                DateUtils.toDate(model.birthDay!!),
-                mutableSetOf())
-        } else {
-            patient = patient.copy(
-                firstName = model.firstName!!,
-                lastName = model.lastName!!,
-                pesel = model.pesel,
-                address1 = model.address1!!,
-                address2 = when (val it = model.address2) {
-                    "" -> null
-                    else -> it
-                },
-                city = model.city!!,
-                zipCode = model.zipCode!!,
-                birth = DateUtils.toDate(model.birthDay!!))
-        }
-        val modelExaminations = model.examinations
-
-        var examination: Examination = if (newExamination) Examination(null, patient, LocalDateTime.now(), modelExaminations[0].code?.substring(0, 1)!!, mutableSetOf()) else examinationRepository.findByIdOrNull(id)!!
-
-        val examinationDetailses = examination.examinationDetails
-        // creating new examination request
-        if (newExamination) {
-            examination = examination.copy(
-                date = LocalDateTime.now(),
-                code = modelExaminations[0].code?.substring(0, 1)!!)
-        }
-        modelExaminations.forEach(Consumer {
-            if (newExamination) {
-                examinationDetailses.add(ExaminationDetails(null, examination, it.code!!, null, null, LocalDateTime.now()))
-            } else {
-                val detail = examinationDetailses
-                    .first { d: ExaminationDetails -> d.code == it.code }
-                    .copy(staffName = it.staffName, value = it.value)
-                examinationDetailses.add(detail)
-            }
-        })
-        return examination
-    }
-
-    private fun map(examination: Examination): ExaminationRequestModel = ExaminationRequestModel(
-        examination.id,
-        examination.patient.firstName,
-        examination.patient.lastName,
-        examination.patient.pesel,
-        DateUtils.fromDate(examination.patient.birth),
-        examination.patient.address1,
-        examination.patient.address2,
-        examination.patient.zipCode,
-        examination.patient.city,
-        examination.patient.phone,
-        examination.examinationDetails
-            .map { ExaminationSummaryModel(it.id, it.code, icdService.getByCode2(it.code).name2, it.staffName, it.value) }
-            .toMutableList()
-    )
-
-    private fun mapToExaminationModel(examination: Examination): ExaminationModel = ExaminationModel(
-        examination.id,
-        DateUtils.fromDateTime(examination.date),
-        examination.code,
-        examination.patient.pesel,
-        examination.patient.lastName,
-        examination.patient.firstName,
-        StringJoiner(" ")
-            .add(examination.patient.address1)
-            .add(examination.patient.address2)
-            .toString(),
-        examination.patient.phone
-    )
+    private fun isNewExamination(model: ExaminationRequestModel) = model.examinationId == null
 
     companion object {
         private val log = LoggerFactory.getLogger(ExaminationService::class.java)

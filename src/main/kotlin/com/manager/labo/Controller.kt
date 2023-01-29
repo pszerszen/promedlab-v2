@@ -9,6 +9,7 @@ import com.manager.labo.service.ExaminationService
 import com.manager.labo.service.IcdService
 import com.manager.labo.service.PatientService
 import com.manager.labo.utils.*
+import com.manager.labo.validator.ExaminationRequestValidator
 import com.manager.labo.view.ExaminationDetails
 import com.manager.labo.view.ExaminationList
 import com.manager.labo.view.MainPanel
@@ -28,7 +29,8 @@ import kotlin.system.exitProcess
 class Controller(
     private val icdService: IcdService,
     private val patientService: PatientService,
-    private val examinationService: ExaminationService
+    private val examinationService: ExaminationService,
+    private val examinationRequestValidator: ExaminationRequestValidator
 ) : JFrame("PRO-LAB-MANAGER"), ActionListener, WindowListener {
     private var mainPanel: MainPanel? = null
     private var examinationList: ExaminationList? = null
@@ -143,7 +145,7 @@ class Controller(
                     var errors: Set<String?> = HashSet()
                     val newExamination = model.examinationId == null
                     try {
-                        errors = examinationService.validate(model, !newExamination)
+                        errors = examinationRequestValidator.validate(model, !newExamination)
                         if (CollectionUtils.isNotEmpty(errors)) {
                             val panel = JPanel()
                             panel.add(JList(errors.toTypedArray()))

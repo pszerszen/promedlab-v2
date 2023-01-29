@@ -1,10 +1,10 @@
 package com.manager.labo.service
 
 import com.manager.labo.entities.Patient
+import com.manager.labo.mapper.PatientMapper
+import com.manager.labo.model.ExaminationRequestModel
 import com.manager.labo.model.PatientModel
 import com.manager.labo.repository.PatientRepository
-import com.manager.labo.utils.DateUtils
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -14,59 +14,28 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 @Transactional
-class PatientService(@Autowired val patientRepository: PatientRepository) {
+class PatientService(
+    private val patientRepository: PatientRepository,
+    private val patientMapper: PatientMapper
+) {
 
-    fun create(model: PatientModel): Long? = patientRepository.save(convert(model)).id
-
-    fun update(model: PatientModel): Patient = patientRepository.save<Patient>(convert(model))
-
-    fun create(patient: Patient): Long? = patientRepository.save<Patient>(patient).id
-
-    fun update(patient: Patient): Patient = patientRepository.save<Patient>(patient)
+    fun save(patient: Patient): Patient = patientRepository.save(patient)
 
     fun get(id: Long): Patient? = patientRepository.findByIdOrNull(id)
 
     fun getByPesel(pesel: String): Patient? = patientRepository.getByPesel(pesel)
 
-    fun getPatientModelByPesel(pesel: String): PatientModel? = convert(getByPesel(pesel))
+    fun getPatientModelByPesel(pesel: String): PatientModel? = patientMapper.toPatientModel(getByPesel(pesel))
 
-    fun getById(id: Long): PatientModel? = convert(get(id))
+    fun getById(id: Long): PatientModel? = patientMapper.toPatientModel(get(id))
 
-    val all: List<PatientModel> get() = patientRepository.findAll().mapNotNull { this.convert(it) }
+    val all: List<PatientModel> get() = patientRepository.findAll().mapNotNull { patientMapper.toPatientModel(it) }
 
-
-    private fun convert(patient: Patient?): PatientModel? {
-        return when (patient) {
-            null -> {
-                null
-            }
-            else -> PatientModel(
-                patient.id,
-                patient.pesel,
-                DateUtils.fromDate(patient.birth),
-                patient.lastName,
-                patient.firstName,
-                patient.address1,
-                patient.address2,
-                patient.phone,
-                patient.zipCode,
-                patient.city)
-        }
-    }
-
-    private fun convert(model: PatientModel): Patient {
-        return Patient(
-            model.id,
-            model.firstName!!,
-            model.lastName!!,
-            model.pesel,
-            model.address1!!,
-            model.address2,
-            model.city!!,
-            model.zipCode!!,
-            model.phone!!,
-            DateUtils.toDate(model.birthDay!!),
-            emptySet()
-        )
+    fun fromExaminationRequest(model: ExaminationRequestModel): Patient {
+        var patient: Patient? = patientRepository.getByPesel(model.pesel!!)
+        patient = if (patient == null) patientMapper.fromExaminationRequestModel(model)
+        else patientMapper.updateFromExaminationRequestMapper(patient, model)
+        patient = patientRepository.save(patient)
+        return patient
     }
 }

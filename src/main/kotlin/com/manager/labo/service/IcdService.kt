@@ -13,8 +13,6 @@ import java.util.*
 @Transactional
 class IcdService(private val icdRepository: IcdRepository) {
 
-    fun getById(id: Long): Optional<Icd> = icdRepository.findById(id)
-
     fun getByCode1(code: String?): List<Icd> = icdRepository.getByCode1(code!!)
 
     fun getByCode2(code: String?): Icd = icdRepository.getByCode2(code!!)
@@ -23,10 +21,10 @@ class IcdService(private val icdRepository: IcdRepository) {
 
     val groups: List<String>
         get() = allIcds
-            .map { icd: Icd -> icd.code1 + " - " + icd.name1 }
+            .map { it.code1 + " - " + it.name1 }
             .distinct()
             .sorted()
 
     fun getExaminationsFromGroup(code: String?): List<String> = getByCode1(code)
-        .map { icd: Icd -> icd.code2 + " - " + icd.name2 }
+        .map { it.code2 + " - " + it.name2 }
 }
