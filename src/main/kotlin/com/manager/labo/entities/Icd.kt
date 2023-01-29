@@ -34,6 +34,11 @@ data class Icd(
 
     override fun hashCode(): Int = javaClass.hashCode()
 
-    override fun toString(): String = "Icd(code1='$code1', name1='$name1', code2='$code2', name2='$name2')"
+    override fun toString(): String = """
+        Icd(code1='$code1', 
+            name1='$name1', 
+            code2='$code2', 
+            name2='$name2')
+        """.trimIndent()
 
 }

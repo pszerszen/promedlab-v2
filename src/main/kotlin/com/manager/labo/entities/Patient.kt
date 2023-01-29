@@ -32,7 +32,7 @@ data class Patient(
     @Column(name = "birth", columnDefinition = "DATE", nullable = false)
     val birth: LocalDate,
     @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
-    val examinations: Set<Examination> = mutableSetOf()
+    val examinations: MutableSet<Examination> = mutableSetOf()
 ) {
 
     override fun equals(other: Any?): Boolean {

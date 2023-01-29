@@ -15,7 +15,7 @@ data class Examination(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH])
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patientId", nullable = false)
     val patient: Patient,
     @Column(name = "date", columnDefinition = "DATETIME", nullable = false)
@@ -37,7 +37,8 @@ data class Examination(
     override fun hashCode(): Int = javaClass.hashCode()
 
     override fun toString(): String = """
-        Examination(patient=$patient, 
+        Examination(id=$id
+                    patient=$patient, 
                     date=$date, 
                     code='$code', 
                     examinationDetails=$examinationDetails)
