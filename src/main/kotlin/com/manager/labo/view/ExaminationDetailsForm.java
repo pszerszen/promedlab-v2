@@ -5,11 +5,13 @@ import static com.manager.labo.utils.ActionCommandsKt.EXAMINATION_SUBMIT;
 import static com.manager.labo.utils.ActionCommandsKt.EXIT;
 import static com.manager.labo.utils.ActionCommandsKt.REMOVE_FROM_EXAMINATIONS;
 import static com.manager.labo.utils.ActionCommandsKt.SEARCH_FOR_PATIENT;
+import static com.manager.labo.utils.ActionCommandsKt.SWITCH_AVAILABLE_EXAMINATIONS;
 
 import com.manager.labo.model.ExaminationRequestModel;
 import com.manager.labo.model.ExaminationSummaryModel;
 import com.manager.labo.utils.ActionCommand;
 import com.manager.labo.view.components.LaboTableModel;
+import java.text.SimpleDateFormat;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
@@ -19,9 +21,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.text.DateFormatter;
+import javax.swing.text.MaskFormatter;
+import lombok.SneakyThrows;
 
 public class ExaminationDetailsForm extends JPanel {
-    private final ExaminationRequestModel model;
+    private ExaminationRequestModel model;
     private LaboTableModel<ExaminationSummaryModel> examinationTableModel;
 
     private JLabel nameLbl;
@@ -43,11 +48,12 @@ public class ExaminationDetailsForm extends JPanel {
     private JTextField address2;
     private JTextField city;
     private JFormattedTextField zipCode;
-    private JFormattedTextField phone;
+    private JTextField phone;
     private JLabel examinationGroupLbl;
     private JLabel examinationListLbl;
+    @ActionCommand(SWITCH_AVAILABLE_EXAMINATIONS)
     private JComboBox<String> examinationGroup;
-    private JComboBox<String> comboBox2;
+    private JComboBox<String> availableExaminations;
     @ActionCommand(ADD_TO_EXAMINATIONS)
     private JButton addToExaminations;
     private JTable table;
@@ -66,11 +72,10 @@ public class ExaminationDetailsForm extends JPanel {
     private JScrollPane scrollPane;
     private JPanel patientData;
 
-    public ExaminationDetailsForm(ExaminationRequestModel model) {
-        this.model = model;
-    }
-
+    @SneakyThrows
     private void createUIComponents() {
-        // TODO: place custom component creation code here
+        birthDay = new JFormattedTextField(new DateFormatter(new SimpleDateFormat("yyyy-MM-dd")));
+        pesel = new JFormattedTextField(new MaskFormatter("###########"));
+        zipCode = new JFormattedTextField(new MaskFormatter("##-###"));
     }
 }
