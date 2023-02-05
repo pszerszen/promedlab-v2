@@ -1,33 +1,26 @@
 package com.manager.labo.view
 
-import com.manager.labo.utils.*
+import com.manager.labo.utils.ActionCommand
+import com.manager.labo.utils.EXAMINATION_ADD
+import com.manager.labo.utils.EXAMINATION_LIST
+import com.manager.labo.utils.PATIENT_LIST
 import com.manager.labo.view.components.JPanelEnchancer
-import java.awt.Dimension
 import javax.swing.JButton
 import javax.swing.JPanel
 
 class MainPanel : JPanel() {
     @ActionCommand(EXAMINATION_ADD)
-    private val btnNewRequest: JButton
+    private var newRequest: JButton? = null
 
     @ActionCommand(PATIENT_LIST)
-    private val btnPatientsLists: JButton
+    private var patientsLists: JButton? = null
 
     @ActionCommand(EXAMINATION_LIST)
-    private val btnExaminationList: JButton
-
-    init {
-        size = Dimension(440, 115)
-        layout = null
-        btnNewRequest = JButton("Nowe zlecenie")
-        btnNewRequest.setBounds(10, 49, 131, 23)
-        add(btnNewRequest)
-        btnPatientsLists = JButton("Lista Pacjentów")
-        btnPatientsLists.setBounds(151, 49, 131, 23)
-        add(btnPatientsLists)
-        btnExaminationList = JButton("Lista Badań")
-        btnExaminationList.setBounds(292, 49, 131, 23)
-        add(btnExaminationList)
+    private var examinationList: JButton? = null
+    private fun createUIComponents() {
+        newRequest = JButton()
+        patientsLists = JButton()
+        examinationList = JButton()
         JPanelEnchancer(this).standardActions().initButtonsActionCommands()
     }
 }
