@@ -6,7 +6,7 @@ import com.manager.labo.view.components.TableModelName;
 
 public class PatientListPanel extends AbstractListPanel<PatientModel> {
 
-    protected PatientListPanel(LaboTableModel<PatientModel> tableModel, String typePrefix, String actionButtonText) {
+    public PatientListPanel() {
         super(
             new LaboTableModel<>(TableModelName.PATIENTS, "PESEL", "Nazwisko", "Imię", "Adres", "Telefon"),
             "Patient-",
