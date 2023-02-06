@@ -5,10 +5,8 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Consumer
 import javax.swing.table.DefaultTableModel
 
-class LaboTableModel<M : Any>(
-    private val name: TableModelName,
-    vararg columns: String?
-) : DefaultTableModel(columns, 0) {
+class LaboTableModel<M : Any>(private val name: TableModel) : DefaultTableModel(name.columns, 0) {
+
     private val modelTable: MutableMap<Int, M> = ConcurrentHashMap()
 
     override fun isCellEditable(row: Int, column: Int): Boolean = false
@@ -24,32 +22,25 @@ class LaboTableModel<M : Any>(
         super.setRowCount(rowCount)
     }
 
-    fun addRows(models: List<M>) {
-        models.forEach(Consumer { model: M -> this.addRow(model) })
-    }
+    fun addRows(models: List<M>) = models.forEach(Consumer { model: M -> this.addRow(model) })
 
     fun getRowAsModel(row: Int): M? = modelTable[row]
 
     fun getRowsAsModels(vararg rows: Int): List<M?> = rows.map { getRowAsModel(it) }
 
-    val modelList: List<M>
-        get() {
-            return modelTable.values.toList()
-        }
+    val modelList: List<M> get() = modelTable.values.toList()
 
     fun addRow(model: M) {
         val row: MutableMap<Int, String> = HashMap()
         model.javaClass.declaredFields.forEach { field ->
             field.isAccessible = true
-            val displayInJTables = field.getAnnotationsByType<DisplayInJTable>(DisplayInJTable::class.java)
-            for (displayInJTable in displayInJTables) {
-                if (name == displayInJTable.name) {
+            field.getAnnotationsByType(DisplayInJTable::class.java)
+                .filter { it.name == name }
+                .forEach {
                     try {
-                        row[displayInJTable.order] = field.get(model).toString()
-                    } catch (ignore: Exception) {
-                    }
+                        row[it.order] = field.get(model).toString()
+                    } catch (ignore: Exception){}
                 }
-            }
         }
         val tableRow = arrayOfNulls<Any>(row.size)
         (0 until row.size).forEach { tableRow[it] = row[it] }

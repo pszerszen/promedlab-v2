@@ -2,12 +2,12 @@ package com.manager.labo.view
 
 import com.manager.labo.model.PatientModel
 import com.manager.labo.view.components.LaboTableModel
-import com.manager.labo.view.components.TableModelName
+import com.manager.labo.view.components.TableModel
 
 class PatientList : ListPanel<PatientModel>() {
 
     override fun initTableModel() {
-        tableModel = LaboTableModel(TableModelName.PATIENTS, "PESEL", "Nazwisko", "Imię", "Adres", "Telefon")
+        tableModel = LaboTableModel(TableModel.PATIENTS)
     }
 
     override val typePrefix: String get() = "Patient-"

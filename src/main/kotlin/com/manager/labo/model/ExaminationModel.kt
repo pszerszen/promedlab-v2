@@ -1,30 +1,30 @@
 package com.manager.labo.model
 
 import com.manager.labo.utils.DisplayInJTable
-import com.manager.labo.view.components.TableModelName
+import com.manager.labo.view.components.TableModel
 
 class ExaminationModel {
     var id: Long? = null
 
-    @DisplayInJTable(TableModelName.REQUESTS, 0)
+    @DisplayInJTable(TableModel.REQUESTS, 0)
     var requestDate: String? = null
 
-    @DisplayInJTable(TableModelName.REQUESTS, 1)
+    @DisplayInJTable(TableModel.REQUESTS, 1)
     var code: String? = null
 
-    @DisplayInJTable(TableModelName.REQUESTS, 2)
+    @DisplayInJTable(TableModel.REQUESTS, 2)
     var pesel: String? = null
 
-    @DisplayInJTable(TableModelName.REQUESTS, 3)
+    @DisplayInJTable(TableModel.REQUESTS, 3)
     var lastName: String? = null
 
-    @DisplayInJTable(TableModelName.REQUESTS, 4)
+    @DisplayInJTable(TableModel.REQUESTS, 4)
     var firstName: String? = null
 
-    @DisplayInJTable(TableModelName.REQUESTS, 5)
+    @DisplayInJTable(TableModel.REQUESTS, 5)
     var address: String? = null
 
-    @DisplayInJTable(TableModelName.REQUESTS, 6)
+    @DisplayInJTable(TableModel.REQUESTS, 6)
     var phone: String? = null
 
     constructor()

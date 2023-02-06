@@ -6,7 +6,7 @@ import com.manager.labo.model.PatientModel
 import com.manager.labo.utils.*
 import com.manager.labo.view.components.JPanelEnchancer
 import com.manager.labo.view.components.LaboTableModel
-import com.manager.labo.view.components.TableModelName
+import com.manager.labo.view.components.TableModel
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import java.awt.Dimension
@@ -141,7 +141,7 @@ class ExaminationDetails @JvmOverloads constructor(model: ExaminationRequestMode
         scrollPane.border = TitledBorder(null, "Lista zleconych bada\u0144", TitledBorder.LEADING, TitledBorder.TOP, null, null)
         scrollPane.setBounds(10, 269, 697, 246)
         add(scrollPane)
-        examinationTableModel = LaboTableModel(TableModelName.EXAMINATIONS_SET, "Kod badania", "Nazwa Badania", "Badający", "Wynik")
+        examinationTableModel = LaboTableModel(TableModel.EXAMINATIONS_SET)
         table = JTable(examinationTableModel)
         scrollPane.setViewportView(table)
         removeFromExaminations = JButton("Usuń wybrane badanie z listy")
