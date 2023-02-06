@@ -7,9 +7,9 @@ import javax.swing.table.DefaultTableModel
 
 class LaboTableModel<M : Any>(
     private val name: TableModelName,
-    vararg columns: String?,
-    private val modelTable: MutableMap<Int, M> = ConcurrentHashMap()
+    vararg columns: String?
 ) : DefaultTableModel(columns, 0) {
+    private val modelTable: MutableMap<Int, M> = ConcurrentHashMap()
 
     override fun isCellEditable(row: Int, column: Int): Boolean = false
 

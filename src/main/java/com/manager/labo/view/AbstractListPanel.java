@@ -33,13 +33,10 @@ public abstract class AbstractListPanel<T> extends JPanel {
         new JPanelEnchancer(this).standardActions();
     }
 
-    protected abstract void initTableModel();
-
     private void createUIComponents() {
         action = new JButton(actionButtonText);
         action.setActionCommand(typePrefix + SEE);
 
-        initTableModel();
         table = new JTable();
         table.setModel(tableModel);
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
