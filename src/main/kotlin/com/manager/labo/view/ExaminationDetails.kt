@@ -309,33 +309,33 @@ class ExaminationDetails @JvmOverloads constructor(model: ExaminationRequestMode
         }
     }
 
-        private fun setUpModelValues(model: Any, field: Field, component: JTextComponent) {
-            try {
-                field[model] = component.text
-            } catch (e: IllegalArgumentException) {
-                e.printStackTrace()
-            } catch (e: IllegalAccessException) {
-                e.printStackTrace()
-            }
-        }
-
-        private fun setUpSwingComponentValues(model: Any, field: Field, component: JTextComponent) {
-            val `object`: Any?
-            try {
-                `object` = field[model]
-                component.text = `object`?.toString() ?: ""
-            } catch (e: IllegalArgumentException) {
-                e.printStackTrace()
-            } catch (e: IllegalAccessException) {
-                e.printStackTrace()
-            }
-        }
-
-        private fun interface TriConsumer {
-            fun accept(model: Any, field: Field, component: JTextComponent)
-        }
-
-        companion object {
-            private val log = LoggerFactory.getLogger(ExaminationDetails::class.java)
+    private fun setUpModelValues(model: Any, field: Field, component: JTextComponent) {
+        try {
+            field[model] = component.text
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+        } catch (e: IllegalAccessException) {
+            e.printStackTrace()
         }
     }
+
+    private fun setUpSwingComponentValues(model: Any, field: Field, component: JTextComponent) {
+        val `object`: Any?
+        try {
+            `object` = field[model]
+            component.text = `object`?.toString() ?: ""
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+        } catch (e: IllegalAccessException) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun interface TriConsumer {
+        fun accept(model: Any, field: Field, component: JTextComponent)
+    }
+
+    companion object {
+        private val log = LoggerFactory.getLogger(ExaminationDetails::class.java)
+    }
+}
