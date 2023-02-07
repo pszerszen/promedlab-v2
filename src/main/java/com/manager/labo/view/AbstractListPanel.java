@@ -13,11 +13,11 @@ public abstract class AbstractListPanel<T> extends JPanel {
     private static final String SEE = "See";
     private static final String RELOAD = "Reload";
 
-    private final LaboTableModel<T> tableModel;
+    final LaboTableModel<T> tableModel;
     private final String typePrefix;
     private final String actionButtonText;
 
-    private JTable table;
+    JTable table;
     private JPanel mainPanel;
     private JButton back;
     private JButton action;
@@ -30,7 +30,6 @@ public abstract class AbstractListPanel<T> extends JPanel {
         this.actionButtonText = actionButtonText;
 
         postCreateUIComponents();
-        new JPanelEnchancer(this).standardActions();
     }
 
     private void createUIComponents() {
@@ -46,7 +45,8 @@ public abstract class AbstractListPanel<T> extends JPanel {
     private void postCreateUIComponents() {
         reload.setActionCommand(typePrefix + RELOAD);
         add(mainPanel);
-        setSize(mainPanel.getSize());
+        setSize(mainPanel.getPreferredSize());
+        new JPanelEnchancer(this).standardActions();
     }
 
     public T getCurrentModel() {

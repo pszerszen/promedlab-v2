@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.manager.labo.view.ExaminationDetailsForm">
-  <grid id="27dc6" binding="panel" custom-create="true" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+  <grid id="27dc6" binding="mainPanel" custom-create="true" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="10" left="5" bottom="10" right="5"/>
     <constraints>
-      <xy x="20" y="20" width="789" height="650"/>
+      <xy x="20" y="20" width="800" height="700"/>
     </constraints>
-    <properties/>
+    <properties>
+      <minimumSize width="800" height="700"/>
+      <preferredSize width="800" height="700"/>
+    </properties>
     <border type="none"/>
     <children>
       <grid id="36973" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -367,7 +370,7 @@
                   <text value="Wynik badania"/>
                 </properties>
               </component>
-              <component id="150e3" class="javax.swing.JSpinner" binding="examinationValue">
+              <component id="150e3" class="javax.swing.JSpinner" binding="examinationValue" custom-create="true">
                 <constraints>
                   <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>

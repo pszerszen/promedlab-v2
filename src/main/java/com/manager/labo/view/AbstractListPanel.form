@@ -7,6 +7,7 @@
     </constraints>
     <properties>
       <minimumSize width="1000" height="570"/>
+      <preferredSize width="1000" height="570"/>
     </properties>
     <border type="none"/>
     <children>
@@ -39,11 +40,47 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="59875" class="javax.swing.JButton" binding="back">
+          <component id="d057f" class="javax.swing.JButton" binding="action" custom-create="true">
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
+              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
                 <minimum-size width="170" height="57"/>
                 <preferred-size width="170" height="57"/>
+                <maximum-size width="170" height="-1"/>
+              </grid>
+            </constraints>
+            <properties>
+              <background color="-13382656"/>
+              <margin top="10" left="0" bottom="10" right="0"/>
+              <text value="Button"/>
+            </properties>
+          </component>
+          <hspacer id="85057">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </hspacer>
+          <component id="e31aa" class="javax.swing.JButton" binding="reload">
+            <constraints>
+              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
+                <minimum-size width="170" height="57"/>
+                <preferred-size width="170" height="57"/>
+                <maximum-size width="170" height="-1"/>
+              </grid>
+            </constraints>
+            <properties>
+              <background color="-65536"/>
+              <foreground color="-1"/>
+              <icon value="assets/redo.png"/>
+              <margin top="10" left="0" bottom="10" right="0"/>
+              <text value="Przeładuj"/>
+            </properties>
+          </component>
+          <component id="59875" class="javax.swing.JButton" binding="back">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="2" hsize-policy="2" anchor="0" fill="1" indent="0" use-parent-layout="false">
+                <minimum-size width="170" height="57"/>
+                <preferred-size width="170" height="57"/>
+                <maximum-size width="170" height="-1"/>
               </grid>
             </constraints>
             <properties>
@@ -55,39 +92,6 @@
               <text value="Wróć"/>
             </properties>
           </component>
-          <component id="d057f" class="javax.swing.JButton" binding="action" custom-create="true">
-            <constraints>
-              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
-                <minimum-size width="170" height="57"/>
-                <preferred-size width="170" height="57"/>
-              </grid>
-            </constraints>
-            <properties>
-              <background color="-13382656"/>
-              <margin top="10" left="0" bottom="10" right="0"/>
-              <text value="Button"/>
-            </properties>
-          </component>
-          <component id="e31aa" class="javax.swing.JButton" binding="reload">
-            <constraints>
-              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false">
-                <minimum-size width="170" height="57"/>
-                <preferred-size width="170" height="57"/>
-              </grid>
-            </constraints>
-            <properties>
-              <background color="-65536"/>
-              <foreground color="-1"/>
-              <icon value="assets/redo.png"/>
-              <margin top="10" left="0" bottom="10" right="0"/>
-              <text value="Przeładuj"/>
-            </properties>
-          </component>
-          <hspacer id="85057">
-            <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-            </constraints>
-          </hspacer>
         </children>
       </grid>
     </children>

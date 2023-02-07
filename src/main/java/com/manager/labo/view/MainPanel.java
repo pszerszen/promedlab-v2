@@ -17,9 +17,7 @@ public class MainPanel extends JPanel {
 
     public MainPanel() {
         super();
-        add(mainPanel);
-        setSize(mainPanel.getSize());
-        new JPanelEnchancer(this).standardActions().initButtonsActionCommands();
+        postCreateUIComponents();
     }
 
     private void createUIComponents() {
@@ -27,6 +25,12 @@ public class MainPanel extends JPanel {
         newRequest = new JButton();
         patientsLists = new JButton();
         examinationList = new JButton();
+    }
+
+    private void postCreateUIComponents() {
+        add(mainPanel);
+        setSize(mainPanel.getPreferredSize());
+        new JPanelEnchancer(this).standardActions().initButtonsActionCommands();
     }
 
 }

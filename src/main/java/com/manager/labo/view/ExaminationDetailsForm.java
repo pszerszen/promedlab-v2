@@ -17,6 +17,7 @@ import com.manager.labo.view.components.JPanelEnchancer;
 import com.manager.labo.view.components.LaboTableModel;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import javax.swing.JButton;
@@ -29,7 +30,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.text.DateFormatter;
+import javax.swing.text.DefaultFormatter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.MaskFormatter;
 import lombok.Getter;
@@ -40,7 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ExaminationDetailsForm extends JPanel {
 
     @Getter
-    private final ExaminationRequestModel model;
+    private final transient ExaminationRequestModel model;
     private LaboTableModel<ExaminationSummaryModel> examinationTableModel;
 
     private JLabel nameLbl;
@@ -85,14 +88,28 @@ public class ExaminationDetailsForm extends JPanel {
     private JPanel topRightPanel;
     private JScrollPane scrollPane;
     private JPanel patientData;
-    private JPanel panel;
+    private JPanel mainPanel;
 
     public ExaminationDetailsForm(ExaminationRequestModel model) {
         super();
         this.model = model;
-        add(panel);
-        setSize(panel.getSize());
-        new JPanelEnchancer(this).standardActions();
+        addExaminationValue.addActionListener(e -> {
+            for (int row : table.getSelectedRows()) {
+                model.getExaminations().get(row).setStaffNameAndValue(examiner.getText(), (int) examinationValue.getValue());
+            }
+            mountValuesFromModel();
+        });
+
+        if (model != null) {
+            mountValuesFromModel();
+
+            disableComponents(firstName, lastName, pesel, zipCode, address1, address2, city, phone, examinationGroup, availableExamination,
+                                 addToExaminations, removeFromExaminations, searchForPatient, birthDay);
+        } else {
+            disableComponents(examinerLbl, examiner, examinationValueLbl, examinationValue, addExaminationValue);
+        }
+
+        postCreateUIComponents();
     }
 
     @SneakyThrows
@@ -101,23 +118,21 @@ public class ExaminationDetailsForm extends JPanel {
         pesel = new JFormattedTextField(new MaskFormatter("###########"));
         zipCode = new JFormattedTextField(new MaskFormatter("##-###"));
 
-        panel = new JPanel();
+        examinationValue = new JSpinner();
+        examinationValue.setModel(new SpinnerNumberModel(0, null, null, 1));
+        examinationValue.setBounds(10, 100, 210, 20);
+        var editor = examinationValue.getEditor();
+        var formattedTextField = (JFormattedTextField) editor.getComponent(0);
+        var formatter = (DefaultFormatter) formattedTextField.getFormatter();
+        formatter.setCommitsOnValidEdit(true);
+
+        mainPanel = new JPanel();
     }
 
-    public String getCurrentExamination() {
-        final String selectedItem = (String) availableExamination.getSelectedItem();
-        return selectedItem.substring(0, 3);
-    }
-
-    public void addExaminationDetail(ExaminationSummaryModel model) {
-        examinationTableModel.addRow(model);
-    }
-
-    public void removeSelectedExamiantionFromTable() {
-        final int selectedRow = table.getSelectedRow();
-        if (selectedRow > -1) {
-            examinationTableModel.removeRow(selectedRow);
-        }
+    private void postCreateUIComponents() {
+        add(mainPanel);
+        setSize(mainPanel.getSize());
+        new JPanelEnchancer(this).standardActions();
     }
 
     public void mountValuesFromModel(PatientModel patientModel) {
@@ -132,7 +147,7 @@ public class ExaminationDetailsForm extends JPanel {
     }
 
     public void initExaminationGroups(List<String> groups) {
-        groups.stream().forEach(examinationGroup::addItem);
+        groups.forEach(examinationGroup::addItem);
     }
 
     public String getCurrentExaminationGroup() {
@@ -142,11 +157,27 @@ public class ExaminationDetailsForm extends JPanel {
 
     public void rewriteAvailableExaminations(List<String> examinations) {
         availableExamination.removeAllItems();
-        examinations.stream().forEach(availableExamination::addItem);
+        examinations.forEach(availableExamination::addItem);
     }
 
     public String getPesel() {
         return pesel.getText();
+    }
+
+    public String getCurrentExamination() {
+        final String selectedItem = (String) availableExamination.getSelectedItem();
+        return selectedItem.substring(0, 3);
+    }
+
+    public void addExaminationDetail(ExaminationSummaryModel model) {
+        examinationTableModel.addRow(model);
+    }
+
+    public void removeSelectedExamiantionFromTable() {
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow > -1) {
+            examinationTableModel.removeRow(selectedRow);
+        }
     }
 
     public void mountValuesFromModel(Object model) {
@@ -157,10 +188,12 @@ public class ExaminationDetailsForm extends JPanel {
         setComponentsEnabled(enable && examinationTableModel.getRowCount() < 1, examinationGroup);
     }
 
+    private void disableComponents(JComponent... components) {
+        setComponentsEnabled(false, components);
+    }
+
     private void setComponentsEnabled(boolean enabled, JComponent... components) {
-        for (JComponent component : components) {
-            component.setEnabled(enabled);
-        }
+        Arrays.stream(components).forEach(c -> c.setEnabled(enabled));
     }
 
     private void mountValuesFromModel() {
@@ -170,15 +203,15 @@ public class ExaminationDetailsForm extends JPanel {
         examinationTableModel.addRows(model.getExaminations());
     }
 
-    private void mappingOperation(Object model, TriConsumer consumer) {
+    void mappingOperation(Object model, TriConsumer consumer) {
         try {
-            for (Field field : model.getClass().getDeclaredFields()) {
-                final MappingField mappingField = field.getAnnotation(MappingField.class);
+            for (var field : model.getClass().getDeclaredFields()) {
+                var mappingField = field.getAnnotation(MappingField.class);
                 if (mappingField != null) {
-                    final String mappingName = Optional.ofNullable(defaultIfEmpty(mappingField.value().trim(), null))
+                    var mappingName = Optional.ofNullable(defaultIfEmpty(mappingField.value().trim(), null))
                         .orElse(field.getName());
                     field.setAccessible(true);
-                    final Field swingField = this.getClass().getDeclaredField(mappingName);
+                    var swingField = this.getClass().getDeclaredField(mappingName);
                     swingField.setAccessible(true);
                     consumer.accept(model, field, (JTextComponent) swingField.get(this));
                 }
@@ -192,9 +225,10 @@ public class ExaminationDetailsForm extends JPanel {
         field.set(model, component.getText());
     }
 
-    private void setUpSwingComponentValues(Object model, Field field, JTextComponent component) throws IllegalAccessException {
-        var object = field.get(model);
-        component.setText(Optional.ofNullable(object).map(Object::toString).orElse(""));
+    void setUpSwingComponentValues(Object model, Field field, JTextComponent component) throws IllegalAccessException {
+        component.setText(Optional.ofNullable(field.get(model))
+                              .map(Object::toString)
+                              .orElse(""));
     }
 
     @FunctionalInterface
