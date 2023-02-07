@@ -27,7 +27,7 @@ class PatientService(
 
     fun getPatientModelByPesel(pesel: String): PatientModel? = patientMapper.toPatientModel(getByPesel(pesel))
 
-    fun getById(id: Long): PatientModel? = patientMapper.toPatientModel(get(id))
+    fun getById(id: Long): PatientModel = patientMapper.toPatientModel(get(id))!!
 
     val all: List<PatientModel> get() = patientRepository.findAll().mapNotNull { patientMapper.toPatientModel(it) }
 

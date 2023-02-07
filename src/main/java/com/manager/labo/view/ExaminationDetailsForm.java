@@ -35,15 +35,13 @@ import javax.swing.text.DateFormatter;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.MaskFormatter;
-import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ExaminationDetailsForm extends JPanel {
 
-    @Getter
-    private final transient ExaminationRequestModel model;
+    private final ExaminationRequestModel model;
     private LaboTableModel<ExaminationSummaryModel> examinationTableModel;
 
     private JLabel nameLbl;
@@ -133,6 +131,10 @@ public class ExaminationDetailsForm extends JPanel {
         add(mainPanel);
         setSize(mainPanel.getSize());
         new JPanelEnchancer(this).standardActions();
+    }
+
+    public ExaminationRequestModel getModel() {
+        return model;
     }
 
     public void mountValuesFromModel(PatientModel patientModel) {

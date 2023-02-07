@@ -10,10 +10,10 @@ import com.manager.labo.service.IcdService
 import com.manager.labo.service.PatientService
 import com.manager.labo.utils.*
 import com.manager.labo.validator.ExaminationRequestValidator
-import com.manager.labo.view.ExaminationDetails
-import com.manager.labo.view.ExaminationList
+import com.manager.labo.view.ExaminationDetailsForm
+import com.manager.labo.view.ExaminationListPanel
 import com.manager.labo.view.MainPanel
-import com.manager.labo.view.PatientList
+import com.manager.labo.view.PatientListPanel
 import com.manager.labo.view.components.JPanelEnchancer
 import org.apache.commons.collections4.CollectionUtils
 import org.slf4j.LoggerFactory
@@ -33,9 +33,9 @@ class Controller(
     private val examinationRequestValidator: ExaminationRequestValidator
 ) : JFrame("PRO-LAB-MANAGER"), ActionListener, WindowListener {
     private var mainPanel: MainPanel? = null
-    private var examinationList: ExaminationList? = null
-    private var patientList: PatientList? = null
-    private var examinationDetails: ExaminationDetails? = null
+    private var examinationList: ExaminationListPanel? = null
+    private var patientList: PatientListPanel? = null
+    private var examinationDetails: ExaminationDetailsForm? = null
 
 
     init {
@@ -48,21 +48,20 @@ class Controller(
         log.debug("Action Performed: " + e.actionCommand)
         when (e.actionCommand) {
             "Patient-See" -> {
-                val currentModel: PatientModel? = patientList?.currentModel
-                if (currentModel != null) {
-                    examinationDetails = ExaminationDetails()
-                    val patientModel: PatientModel? = patientService.getById(currentModel.id!!)
-                    examinationDetails!!.mountValuesFromModel(patientModel!!)
+                patientList?.currentModel.let {
+                    examinationDetails = ExaminationDetailsForm(null)
+                    val patientModel: PatientModel = patientService.getById(it?.id!!)
+                    examinationDetails!!.mountValuesFromModel(patientModel)
                     setExaminationDetailsActions()
                 }
             }
 
             "Examination-See" -> {
-                val currentModel2: ExaminationModel? = examinationList?.currentModel
-                if (currentModel2 != null) {
+                val currentModel: ExaminationModel? = examinationList?.currentModel
+                if (currentModel != null) {
                     val examinationModel: ExaminationRequestModel = examinationService
-                        .getExaminationRequestModel(currentModel2.id!!)
-                    examinationDetails = ExaminationDetails(examinationModel)
+                        .getExaminationRequestModel(currentModel.id!!)
+                    examinationDetails = ExaminationDetailsForm(examinationModel)
                     setExaminationDetailsActions()
                 }
             }
@@ -78,7 +77,7 @@ class Controller(
             mainPanel = MainPanel()
             JPanelEnchancer(mainPanel!!)
                 .addAction(EXAMINATION_ADD) {
-                    examinationDetails = ExaminationDetails()
+                    examinationDetails = ExaminationDetailsForm(null)
                     setExaminationDetailsActions()
                 }
                 .addAction(PATIENT_LIST) { setPatientList() }
@@ -89,7 +88,7 @@ class Controller(
 
     private fun setPatientList() {
         if (patientList == null) {
-            patientList = PatientList()
+            patientList = PatientListPanel()
             JPanelEnchancer(patientList!!)
                 .addListeners(this, null)
         }
@@ -99,7 +98,7 @@ class Controller(
 
     private fun setExaminationList() {
         if (examinationList == null) {
-            examinationList = ExaminationList()
+            examinationList = ExaminationListPanel()
             JPanelEnchancer(examinationList!!)
                 .addListeners(this, null)
         }
@@ -141,7 +140,7 @@ class Controller(
                 .addAction(EXIT) { setMainPanel() }
                 .addAction(EXAMINATION_SUBMIT) {
                     examinationDetails!!.loadValuesToModel()
-                    val model: ExaminationRequestModel = examinationDetails!!.getModel()
+                    val model: ExaminationRequestModel = examinationDetails!!.model
                     var errors: Set<String?> = HashSet()
                     val newExamination = model.examinationId == null
                     try {
@@ -169,7 +168,9 @@ class Controller(
 
     private fun setCurrentPanel(jPanel: JPanel) {
         contentPane = jPanel
-        setSize(jPanel.width + 50, jPanel.height + 50)
+        minimumSize = jPanel.minimumSize
+        size = jPanel.preferredSize
+//        setSize(jPanel.width + 50, jPanel.height + 50)
     }
 
     override fun windowOpened(e: WindowEvent) {}
