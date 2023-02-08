@@ -1,10 +1,8 @@
 package com.manager.labo
 
 import com.manager.labo.entities.Icd
-import com.manager.labo.model.ExaminationModel
 import com.manager.labo.model.ExaminationRequestModel
 import com.manager.labo.model.ExaminationSummaryModel
-import com.manager.labo.model.PatientModel
 import com.manager.labo.service.ExaminationService
 import com.manager.labo.service.IcdService
 import com.manager.labo.service.PatientService
@@ -50,18 +48,14 @@ class Controller(
             "Patient-See" -> {
                 patientList?.currentModel.let {
                     examinationDetails = ExaminationDetailsForm(null)
-                    val patientModel: PatientModel = patientService.getById(it?.id!!)
-                    examinationDetails!!.mountValuesFromModel(patientModel)
+                    examinationDetails!!.mountValuesFromModel(patientService.getById(it?.id!!))
                     setExaminationDetailsActions()
                 }
             }
 
             "Examination-See" -> {
-                val currentModel: ExaminationModel? = examinationList?.currentModel
-                if (currentModel != null) {
-                    val examinationModel: ExaminationRequestModel = examinationService
-                        .getExaminationRequestModel(currentModel.id!!)
-                    examinationDetails = ExaminationDetailsForm(examinationModel)
+                examinationList?.currentModel.let {
+                    examinationDetails = ExaminationDetailsForm(examinationService.getExaminationRequestModel(it?.id!!))
                     setExaminationDetailsActions()
                 }
             }
@@ -107,25 +101,17 @@ class Controller(
     }
 
     private fun setExaminationDetailsActions() {
+        examinationDetails
         if (examinationDetails != null) {
             examinationDetails!!.initExaminationGroups(icdService.groups)
-            examinationDetails!!.rewriteAvailableExaminations(
-                icdService.getExaminationsFromGroup(
-                    examinationDetails!!.currentExaminationGroup
-                )
-            )
+            examinationDetails!!.rewriteAvailableExaminations(icdService.getExaminationsFromGroup(examinationDetails!!.currentExaminationGroup))
             JPanelEnchancer(examinationDetails!!)
                 .addAction(SWITCH_AVAILABLE_EXAMINATIONS) {
-                    examinationDetails!!.rewriteAvailableExaminations(
-                        icdService.getExaminationsFromGroup(
-                            examinationDetails!!.currentExaminationGroup
-                        )
-                    )
+                    examinationDetails!!.rewriteAvailableExaminations(icdService.getExaminationsFromGroup(examinationDetails!!.currentExaminationGroup))
                 }
                 .addAction(SEARCH_FOR_PATIENT) {
-                    val model: PatientModel? = patientService.getPatientModelByPesel(examinationDetails!!.getPesel())
-                    if (model != null) {
-                        examinationDetails!!.mountValuesFromModel(model)
+                    patientService.getPatientModelByPesel(examinationDetails!!.pesel).let {
+                        examinationDetails!!.mountValuesFromModel(it)
                     }
                 }
                 .addAction(REMOVE_FROM_EXAMINATIONS) {
