@@ -10,6 +10,6 @@ public class ExaminationListPanel extends AbstractListPanel<ExaminationModel> {
         super(
             new LaboTableModel<>(TableModel.REQUESTS),
             "Examination-",
-            "<html>Szczegóły/ Wprowadź wyniki badań</html>");
+            "Szczegóły/ Wprowadź wyniki badań");
     }
 }

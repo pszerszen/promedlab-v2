@@ -10,7 +10,7 @@ public class PatientListPanel extends AbstractListPanel<PatientModel> {
         super(
             new LaboTableModel<>(TableModel.PATIENTS),
             "Patient-",
-            "<html>Utwórz badanie dla pacjenta</html>");
+            "Utwórz badanie dla pacjenta");
     }
 
 }
