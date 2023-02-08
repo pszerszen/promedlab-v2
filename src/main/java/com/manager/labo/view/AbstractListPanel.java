@@ -33,17 +33,21 @@ public abstract class AbstractListPanel<T> extends JPanel {
     }
 
     private void createUIComponents() {
+        mainPanel = new JPanel();
+
         action = new JButton(actionButtonText);
         action.setActionCommand(typePrefix + SEE);
 
         table = new JTable();
         table.setModel(tableModel);
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        table.setSelectionMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+
+        reload = new JButton();
+        reload.setActionCommand(typePrefix + RELOAD);
     }
 
     private void postCreateUIComponents() {
-        reload.setActionCommand(typePrefix + RELOAD);
         add(mainPanel);
         setSize(mainPanel.getPreferredSize());
         new JPanelEnchancer(this).standardActions();
@@ -57,4 +61,5 @@ public abstract class AbstractListPanel<T> extends JPanel {
         tableModel.setRowCount(0);
         tableModel.addRows(models);
     }
+
 }

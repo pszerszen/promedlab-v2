@@ -102,7 +102,7 @@ public class ExaminationDetailsForm extends JPanel {
             mountValuesFromModel();
 
             disableComponents(firstName, lastName, pesel, zipCode, address1, address2, city, phone, examinationGroup, availableExamination,
-                                 addToExaminations, removeFromExaminations, searchForPatient, birthDay);
+                              addToExaminations, removeFromExaminations, searchForPatient, birthDay);
         } else {
             disableComponents(examinerLbl, examiner, examinationValueLbl, examinationValue, addExaminationValue);
         }
