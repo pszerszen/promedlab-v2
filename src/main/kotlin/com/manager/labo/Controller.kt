@@ -47,7 +47,7 @@ class Controller(
         when (e.actionCommand) {
             "Patient-See" -> {
                 patientList?.currentModel.let {
-                    examinationDetails = ExaminationDetailsForm(null)
+                    examinationDetails = ExaminationDetailsForm()
                     examinationDetails!!.mountValuesFromModel(patientService.getById(it?.id!!))
                     setExaminationDetailsActions()
                 }
@@ -71,7 +71,7 @@ class Controller(
             mainPanel = MainPanel()
             JPanelEnchancer(mainPanel!!)
                 .addAction(EXAMINATION_ADD) {
-                    examinationDetails = ExaminationDetailsForm(null)
+                    examinationDetails = ExaminationDetailsForm()
                     setExaminationDetailsActions()
                 }
                 .addAction(PATIENT_LIST) { setPatientList() }
@@ -154,9 +154,8 @@ class Controller(
 
     private fun setCurrentPanel(jPanel: JPanel) {
         contentPane = jPanel
-        minimumSize = jPanel.minimumSize
-        size = jPanel.preferredSize
-//        setSize(jPanel.width + 50, jPanel.height + 50)
+        setSize(jPanel.width + 50, jPanel.height + 50)
+        repaint()
     }
 
     override fun windowOpened(e: WindowEvent) {}

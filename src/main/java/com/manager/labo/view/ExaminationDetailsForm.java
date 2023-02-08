@@ -15,6 +15,7 @@ import com.manager.labo.utils.ActionCommand;
 import com.manager.labo.utils.MappingField;
 import com.manager.labo.view.components.JPanelEnchancer;
 import com.manager.labo.view.components.LaboTableModel;
+import com.manager.labo.view.components.TableModel;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -41,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ExaminationDetailsForm extends JPanel {
 
-    private final ExaminationRequestModel model;
+    private final transient ExaminationRequestModel model;
     private LaboTableModel<ExaminationSummaryModel> examinationTableModel;
 
     private JLabel nameLbl;
@@ -88,9 +89,13 @@ public class ExaminationDetailsForm extends JPanel {
     private JPanel patientData;
     private JPanel mainPanel;
 
+    public ExaminationDetailsForm() {
+        this(null);
+    }
+
     public ExaminationDetailsForm(ExaminationRequestModel model) {
         super();
-        this.model = model;
+        this.model = Optional.ofNullable(model).orElse(new ExaminationRequestModel());
         addExaminationValue.addActionListener(e -> {
             for (int row : table.getSelectedRows()) {
                 model.getExaminations().get(row).setStaffNameAndValue(examiner.getText(), (int) examinationValue.getValue());
@@ -123,13 +128,16 @@ public class ExaminationDetailsForm extends JPanel {
         var formattedTextField = (JFormattedTextField) editor.getComponent(0);
         var formatter = (DefaultFormatter) formattedTextField.getFormatter();
         formatter.setCommitsOnValidEdit(true);
+        examinationTableModel = new LaboTableModel<>(TableModel.EXAMINATIONS_SET);
+        table = new JTable();
+        table.setModel(examinationTableModel);
 
         mainPanel = new JPanel();
     }
 
     private void postCreateUIComponents() {
         add(mainPanel);
-        setSize(mainPanel.getSize());
+        setSize(mainPanel.getPreferredSize());
         new JPanelEnchancer(this).standardActions();
     }
 
