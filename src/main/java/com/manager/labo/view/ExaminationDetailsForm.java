@@ -38,8 +38,10 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.MaskFormatter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
+@Component
 public class ExaminationDetailsForm extends JPanel {
 
     private final transient ExaminationRequestModel model;
@@ -183,7 +185,7 @@ public class ExaminationDetailsForm extends JPanel {
         examinationTableModel.addRow(model);
     }
 
-    public void removeSelectedExamiantionFromTable() {
+    public void removeSelectedExaminationFromTable() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow > -1) {
             examinationTableModel.removeRow(selectedRow);

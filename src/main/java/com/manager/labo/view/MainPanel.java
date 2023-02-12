@@ -4,7 +4,9 @@ import com.manager.labo.utils.ActionCommand;
 import com.manager.labo.view.components.JPanelEnchancer;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import org.springframework.stereotype.Component;
 
+@Component
 public class MainPanel extends JPanel {
 
     @ActionCommand("Examination-Add")

@@ -49,7 +49,7 @@ class ExaminationRequestModel {
     var phone: String? = null
 
     @Valid
-    var examinations: MutableList<ExaminationSummaryModel> = mutableListOf()
+    val examinations: MutableList<ExaminationSummaryModel> = mutableListOf()
 
     constructor()
 
@@ -76,7 +76,7 @@ class ExaminationRequestModel {
         this.zipCode = zipCode
         this.city = city
         this.phone = phone
-        this.examinations = examinations
+        this.examinations.addAll(examinations)
     }
 
     fun addExamination(examinationSummaryModel: ExaminationSummaryModel) {

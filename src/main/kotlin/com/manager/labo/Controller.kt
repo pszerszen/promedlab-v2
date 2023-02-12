@@ -24,19 +24,35 @@ import javax.swing.*
 import kotlin.system.exitProcess
 
 @Service
-class Controller(
+final class Controller(
     private val icdService: IcdService,
     private val patientService: PatientService,
     private val examinationService: ExaminationService,
-    private val examinationRequestValidator: ExaminationRequestValidator
+    private val examinationRequestValidator: ExaminationRequestValidator,
+    private val mainPanel: MainPanel,
+    private val examinationList: ExaminationListPanel,
+    private val patientList: PatientListPanel
 ) : JFrame("PRO-LAB-MANAGER"), ActionListener, WindowListener {
-    private var mainPanel: MainPanel? = null
-    private var examinationList: ExaminationListPanel? = null
-    private var patientList: PatientListPanel? = null
-    private var examinationDetails: ExaminationDetailsForm? = null
+
+
+    private lateinit var examinationDetails: ExaminationDetailsForm
 
 
     init {
+        JPanelEnchancer(mainPanel)
+            .addAction(EXAMINATION_ADD) {
+                examinationDetails = ExaminationDetailsForm()
+                setExaminationDetailsActions()
+            }
+            .addAction(PATIENT_LIST) { setPatientList() }
+            .addAction(EXAMINATION_LIST) { setExaminationList() }
+
+        JPanelEnchancer(patientList)
+            .addListeners(this, null)
+
+        JPanelEnchancer(examinationList)
+            .addListeners(this, null)
+
         setMainPanel()
         defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
         isVisible = true
@@ -46,110 +62,87 @@ class Controller(
         log.debug("Action Performed: " + e.actionCommand)
         when (e.actionCommand) {
             "Patient-See" -> {
-                patientList?.currentModel.let {
+                patientList.currentModel.let {
                     examinationDetails = ExaminationDetailsForm()
-                    examinationDetails!!.mountValuesFromModel(patientService.getById(it?.id!!))
+                    examinationDetails.mountValuesFromModel(patientService.getById(it?.id!!))
                     setExaminationDetailsActions()
                 }
             }
 
             "Examination-See" -> {
-                examinationList?.currentModel.let {
+                examinationList.currentModel.let {
                     examinationDetails = ExaminationDetailsForm(examinationService.getExaminationRequestModel(it?.id!!))
                     setExaminationDetailsActions()
                 }
             }
 
             BACK -> setMainPanel()
-            "Patient-Reload" -> patientList?.reloadTable(patientService.all)
-            "Examination-Reload" -> examinationList?.reloadTable(examinationService.all)
+            "Patient-Reload" -> patientList.reloadTable(patientService.all)
+            "Examination-Reload" -> examinationList.reloadTable(examinationService.all)
         }
     }
 
     private fun setMainPanel() {
-        if (mainPanel == null) {
-            mainPanel = MainPanel()
-            JPanelEnchancer(mainPanel!!)
-                .addAction(EXAMINATION_ADD) {
-                    examinationDetails = ExaminationDetailsForm()
-                    setExaminationDetailsActions()
-                }
-                .addAction(PATIENT_LIST) { setPatientList() }
-                .addAction(EXAMINATION_LIST) { setExaminationList() }
-        }
-        setCurrentPanel(mainPanel!!)
+        setCurrentPanel(mainPanel)
     }
 
     private fun setPatientList() {
-        if (patientList == null) {
-            patientList = PatientListPanel()
-            JPanelEnchancer(patientList!!)
-                .addListeners(this, null)
-        }
-        patientList?.reloadTable(patientService.all)
-        setCurrentPanel(patientList!!)
+        patientList.reloadTable(patientService.all)
+        setCurrentPanel(patientList)
     }
 
     private fun setExaminationList() {
-        if (examinationList == null) {
-            examinationList = ExaminationListPanel()
-            JPanelEnchancer(examinationList!!)
-                .addListeners(this, null)
-        }
-        examinationList?.reloadTable(examinationService.all)
-        setCurrentPanel(examinationList!!)
+        examinationList.reloadTable(examinationService.all)
+        setCurrentPanel(examinationList)
     }
 
     private fun setExaminationDetailsActions() {
-        examinationDetails
-        if (examinationDetails != null) {
-            examinationDetails!!.initExaminationGroups(icdService.groups)
-            examinationDetails!!.rewriteAvailableExaminations(icdService.getExaminationsFromGroup(examinationDetails!!.currentExaminationGroup))
-            JPanelEnchancer(examinationDetails!!)
-                .addAction(SWITCH_AVAILABLE_EXAMINATIONS) {
-                    examinationDetails!!.rewriteAvailableExaminations(icdService.getExaminationsFromGroup(examinationDetails!!.currentExaminationGroup))
+        examinationDetails.initExaminationGroups(icdService.groups)
+        examinationDetails.rewriteAvailableExaminations(icdService.getExaminationsFromGroup(examinationDetails.currentExaminationGroup))
+        JPanelEnchancer(examinationDetails)
+            .addAction(SWITCH_AVAILABLE_EXAMINATIONS) {
+                examinationDetails.rewriteAvailableExaminations(icdService.getExaminationsFromGroup(examinationDetails.currentExaminationGroup))
+            }
+            .addAction(SEARCH_FOR_PATIENT) {
+                patientService.getPatientModelByPesel(examinationDetails.pesel).let {
+                    examinationDetails.mountValuesFromModel(it)
                 }
-                .addAction(SEARCH_FOR_PATIENT) {
-                    patientService.getPatientModelByPesel(examinationDetails!!.pesel).let {
-                        examinationDetails!!.mountValuesFromModel(it)
+            }
+            .addAction(REMOVE_FROM_EXAMINATIONS) {
+                examinationDetails.removeSelectedExaminationFromTable()
+                examinationDetails.enableExaminationGroup(true)
+            }
+            .addAction(ADD_TO_EXAMINATIONS) {
+                val icd: Icd = icdService.getByCode2(examinationDetails.currentExamination)
+                examinationDetails.addExaminationDetail(ExaminationSummaryModel(icd.code2, icd.name2))
+                examinationDetails.enableExaminationGroup(false)
+            }
+            .addAction(EXIT) { setMainPanel() }
+            .addAction(EXAMINATION_SUBMIT) {
+                examinationDetails.loadValuesToModel()
+                val model: ExaminationRequestModel = examinationDetails.model
+                var errors: Set<String?> = HashSet()
+                val newExamination = model.examinationId == null
+                try {
+                    errors = examinationRequestValidator.validate(model, !newExamination)
+                    if (CollectionUtils.isNotEmpty(errors)) {
+                        val panel = JPanel()
+                        panel.add(JList(errors.toTypedArray()))
+                        JOptionPane.showMessageDialog(this, panel, "Błędy walidacji.", JOptionPane.ERROR_MESSAGE)
                     }
+                } catch (ex: Exception) {
+                    log.error("Error while validating:", ex)
                 }
-                .addAction(REMOVE_FROM_EXAMINATIONS) {
-                    examinationDetails!!.removeSelectedExamiantionFromTable()
-                    examinationDetails!!.enableExaminationGroup(true)
-                }
-                .addAction(ADD_TO_EXAMINATIONS) {
-                    val icd: Icd = icdService.getByCode2(examinationDetails!!.currentExamination)
-                    examinationDetails!!.addExaminationDetail(ExaminationSummaryModel(icd.code2, icd.name2))
-                    examinationDetails!!.enableExaminationGroup(false)
-                }
-                .addAction(EXIT) { setMainPanel() }
-                .addAction(EXAMINATION_SUBMIT) {
-                    examinationDetails!!.loadValuesToModel()
-                    val model: ExaminationRequestModel = examinationDetails!!.model
-                    var errors: Set<String?> = HashSet()
-                    val newExamination = model.examinationId == null
-                    try {
-                        errors = examinationRequestValidator.validate(model, !newExamination)
-                        if (CollectionUtils.isNotEmpty(errors)) {
-                            val panel = JPanel()
-                            panel.add(JList(errors.toTypedArray()))
-                            JOptionPane.showMessageDialog(this, panel, "Błędy walidacji.", JOptionPane.ERROR_MESSAGE)
-                        }
-                    } catch (ex: Exception) {
-                        log.error("Error while validating:", ex)
+                if (errors.isEmpty()) {
+                    if (newExamination) {
+                        examinationService.create(model)
+                    } else {
+                        examinationService.update(model)
                     }
-                    if (errors.isEmpty()) {
-                        if (newExamination) {
-                            examinationService.create(model)
-                        } else {
-                            examinationService.update(model)
-                        }
-                        setExaminationList()
-                    }
+                    setExaminationList()
                 }
-        }
-        setCurrentPanel(examinationDetails!!)
+            }
+        setCurrentPanel(examinationDetails)
     }
 
     private fun setCurrentPanel(jPanel: JPanel) {
@@ -158,18 +151,35 @@ class Controller(
         repaint()
     }
 
-    override fun windowOpened(e: WindowEvent) {}
+    override fun windowOpened(e: WindowEvent) {
+        // NO ACTION
+    }
+
     override fun windowClosing(e: WindowEvent) {
         e.window.dispose()
         this.dispose()
         exitProcess(EXIT_ON_CLOSE)
     }
 
-    override fun windowClosed(e: WindowEvent) {}
-    override fun windowIconified(e: WindowEvent) {}
-    override fun windowDeiconified(e: WindowEvent) {}
-    override fun windowActivated(e: WindowEvent) {}
-    override fun windowDeactivated(e: WindowEvent) {}
+    override fun windowClosed(e: WindowEvent) {
+        // NO ACTION
+    }
+
+    override fun windowIconified(e: WindowEvent) {
+        // NO ACTION
+    }
+
+    override fun windowDeiconified(e: WindowEvent) {
+        // NO ACTION
+    }
+
+    override fun windowActivated(e: WindowEvent) {
+        // NO ACTION
+    }
+
+    override fun windowDeactivated(e: WindowEvent) {
+        // NO ACTION
+    }
 
     companion object {
         private val log = LoggerFactory.getLogger(Controller::class.java)
