@@ -2,12 +2,15 @@ package com.manager.labo.view;
 
 import com.manager.labo.view.components.JPanelEnchancer;
 import com.manager.labo.view.components.LaboTableModel;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public abstract class AbstractListPanel<T> extends JPanel implements ListPanelLogic<T> {
+public abstract class AbstractListPanel<T> extends JPanel {
 
     private static final String SEE = "See";
     private static final String RELOAD = "Reload";
@@ -52,4 +55,13 @@ public abstract class AbstractListPanel<T> extends JPanel implements ListPanelLo
         new JPanelEnchancer(this).standardActions();
     }
 
+    @Nullable
+    public T getCurrentModel() {
+        return tableModel.getRowAsModel(table.getSelectedRow());
+    }
+
+    public void reloadTable(@NotNull List<? extends T> models) {
+        tableModel.setRowCount(0);
+        tableModel.addRows(models);
+    }
 }
