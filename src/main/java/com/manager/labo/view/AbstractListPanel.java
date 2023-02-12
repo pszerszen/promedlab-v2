@@ -15,11 +15,11 @@ public abstract class AbstractListPanel<T> extends JPanel {
     private static final String SEE = "See";
     private static final String RELOAD = "Reload";
 
-    final LaboTableModel<T> tableModel;
+    private final LaboTableModel<T> tableModel;
     private final String typePrefix;
     private final String actionButtonText;
 
-    JTable table;
+    private JTable table;
     private JPanel mainPanel;
     private JButton back;
     private JButton action;
