@@ -264,8 +264,8 @@ class ExaminationDetails @JvmOverloads constructor(model: ExaminationRequestMode
         }
     }
 
-    fun mountValuesFromModel(model: Any) {
-        mappingOperation(model) { model: Any, field: Field, component: JTextComponent -> setUpSwingComponentValues(model, field, component) }
+    fun mountValuesFromModel(anyModel: Any) {
+        mappingOperation(anyModel) { model: Any, field: Field, component: JTextComponent -> setUpSwingComponentValues(model, field, component) }
     }
 
     fun enableExaminationGroup(enable: Boolean) {
