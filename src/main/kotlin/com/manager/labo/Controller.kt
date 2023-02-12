@@ -28,15 +28,13 @@ final class Controller(
     private val icdService: IcdService,
     private val patientService: PatientService,
     private val examinationService: ExaminationService,
-    private val examinationRequestValidator: ExaminationRequestValidator,
-    private val mainPanel: MainPanel,
-    private val examinationList: ExaminationListPanel,
-    private val patientList: PatientListPanel
+    private val examinationRequestValidator: ExaminationRequestValidator
 ) : JFrame("PRO-LAB-MANAGER"), ActionListener, WindowListener {
 
-
+    private val mainPanel: MainPanel by lazy { MainPanel() }
+    private val examinationList: ExaminationListPanel by lazy { ExaminationListPanel() }
+    private val patientList: PatientListPanel by lazy { PatientListPanel() }
     private lateinit var examinationDetails: ExaminationDetailsForm
-
 
     init {
         JPanelEnchancer(mainPanel)
