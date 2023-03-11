@@ -37,6 +37,8 @@ final class Controller(
     private lateinit var examinationDetails: ExaminationDetailsForm
 
     init {
+        setApplicationIcon()
+
         JPanelEnchancer(mainPanel)
             .addAction(EXAMINATION_ADD) {
                 examinationDetails = ExaminationDetailsForm()
@@ -146,6 +148,12 @@ final class Controller(
     private fun setCurrentPanel(jPanel: JPanel) {
         contentPane = jPanel
         setSize(jPanel.width + 50, jPanel.height + 50)
+        repaint()
+        log.debug("Current size: {}", size)
+    }
+
+    private fun setApplicationIcon() {
+        iconImage = ImageIcon(javaClass.classLoader.getResource("assets/logo.png")?.path).image
         repaint()
     }
 
