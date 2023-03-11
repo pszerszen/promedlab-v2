@@ -3,6 +3,7 @@ package com.manager.labo.view;
 import com.manager.labo.view.components.JPanelEnchancer;
 import com.manager.labo.view.components.LaboTableModel;
 import java.util.List;
+import java.util.function.UnaryOperator;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -14,6 +15,8 @@ public abstract class AbstractListPanel<T> extends JPanel {
 
     private static final String SEE = "See";
     private static final String RELOAD = "Reload";
+
+    private final UnaryOperator<String> htmlWrap = s -> "<html>" + s + "</html>";
 
     private final LaboTableModel<T> tableModel;
     private final String typePrefix;
@@ -37,7 +40,7 @@ public abstract class AbstractListPanel<T> extends JPanel {
     private void createUIComponents() {
         mainPanel = new JPanel();
 
-        action = new JButton(actionButtonText);
+        action = new JButton(htmlWrap.apply(actionButtonText));
         action.setActionCommand(typePrefix + SEE);
 
         table = new JTable();
@@ -50,6 +53,9 @@ public abstract class AbstractListPanel<T> extends JPanel {
     }
 
     private void postCreateUIComponents() {
+        action.setText(htmlWrap.apply(actionButtonText));
+        action.setActionCommand(typePrefix + SEE);
+
         add(mainPanel);
         setSize(mainPanel.getPreferredSize());
         new JPanelEnchancer(this).standardActions();
