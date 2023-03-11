@@ -11,3 +11,8 @@ spring:
     password: admin!123
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
+logging:
+  level:
+    com:
+      manager:
+        labo: DEBUG
