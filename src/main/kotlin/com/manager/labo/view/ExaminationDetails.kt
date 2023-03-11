@@ -17,6 +17,7 @@ import javax.swing.border.TitledBorder
 import javax.swing.text.DefaultFormatter
 import javax.swing.text.JTextComponent
 
+@Deprecated(message = "Use java swing components", replaceWith = ReplaceWith("com.manager.labo.view.ExaminationDetailsForm"))
 class ExaminationDetails @JvmOverloads constructor(model: ExaminationRequestModel? = null) : JPanel() {
     private val model: ExaminationRequestModel
     private val examinationTableModel: LaboTableModel<ExaminationSummaryModel>

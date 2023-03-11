@@ -7,6 +7,7 @@ import java.awt.Color
 import java.awt.Dimension
 import javax.swing.*
 
+@Deprecated(message = "Use java swing components", replaceWith = ReplaceWith("com.manager.labo.view.AbstractListPanel"))
 abstract class ListPanel<T : Any>(
     private val table: JTable = JTable()
 ) : JPanel() {
