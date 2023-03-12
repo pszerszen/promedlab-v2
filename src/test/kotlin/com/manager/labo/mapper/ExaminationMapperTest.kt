@@ -93,7 +93,7 @@ class ExaminationMapperTest {
 
 
         @Test
-        fun fromExaminationRequestModel(@MockK patient: Patient) =
+        fun fromExaminationRequestModel(@MockK patient: Patient): Unit =
             with(tested.fromExaminationRequestModel(model) { patient }) {
                 id shouldBe null
                 patient shouldBe patient
