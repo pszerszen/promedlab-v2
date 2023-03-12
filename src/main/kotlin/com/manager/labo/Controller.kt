@@ -8,14 +8,12 @@ import com.manager.labo.service.IcdService
 import com.manager.labo.service.PatientService
 import com.manager.labo.utils.*
 import com.manager.labo.validator.ExaminationRequestValidator
-import com.manager.labo.view.ExaminationDetailsForm
-import com.manager.labo.view.ExaminationListPanel
-import com.manager.labo.view.MainPanel
-import com.manager.labo.view.PatientListPanel
+import com.manager.labo.view.*
 import com.manager.labo.view.components.JPanelEnchancer
 import org.apache.commons.collections4.CollectionUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.awt.Dimension
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.WindowEvent
@@ -28,7 +26,8 @@ final class Controller(
     private val icdService: IcdService,
     private val patientService: PatientService,
     private val examinationService: ExaminationService,
-    private val examinationRequestValidator: ExaminationRequestValidator
+    private val examinationRequestValidator: ExaminationRequestValidator,
+    private val defaultSizeProvider: (Class<out DefaultSizeable>) -> Dimension
 ) : JFrame("PRO-LAB-MANAGER"), ActionListener, WindowListener {
 
     private val mainPanel: MainPanel by lazy { MainPanel() }
@@ -145,11 +144,10 @@ final class Controller(
         setCurrentPanel(examinationDetails)
     }
 
-    private fun setCurrentPanel(jPanel: JPanel) {
-        contentPane = jPanel
-        setSize(jPanel.width + 50, jPanel.height + 50)
+    private fun setCurrentPanel(jPanel: DefaultSizeable) {
+        contentPane = jPanel as JPanel
+        this.size = defaultSizeProvider.invoke(jPanel.javaClass)
         repaint()
-        log.debug("Current size: {}", size)
     }
 
     private fun setApplicationIcon() {

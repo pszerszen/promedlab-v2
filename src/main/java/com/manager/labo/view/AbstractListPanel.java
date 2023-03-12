@@ -11,7 +11,7 @@ import javax.swing.ListSelectionModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class AbstractListPanel<T> extends JPanel {
+public abstract sealed class AbstractListPanel<T> extends JPanel implements DefaultSizeable permits ExaminationListPanel, PatientListPanel {
 
     private static final String SEE = "See";
     private static final String RELOAD = "Reload";

@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class ExaminationDetailsForm extends JPanel {
+public final class ExaminationDetailsForm extends JPanel implements DefaultSizeable {
 
     private final transient ExaminationRequestModel model;
     private LaboTableModel<ExaminationSummaryModel> examinationTableModel;

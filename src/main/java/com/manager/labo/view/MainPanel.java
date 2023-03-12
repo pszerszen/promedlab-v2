@@ -5,7 +5,7 @@ import com.manager.labo.view.components.JPanelEnchancer;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-public class MainPanel extends JPanel {
+public final class MainPanel extends JPanel implements DefaultSizeable {
 
     @ActionCommand("Examination-Add")
     private JButton newRequest;
