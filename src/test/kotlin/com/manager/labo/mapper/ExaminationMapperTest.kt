@@ -81,7 +81,7 @@ class ExaminationMapperTest {
     }
 
     @Nested
-    inner class FromModel {
+    inner class FromModelTest {
 
         private lateinit var model: ExaminationRequestModel
 
