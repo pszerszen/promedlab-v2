@@ -33,26 +33,26 @@ class ExaminationMapper {
         examinationDetailsSupplier: () -> MutableList<ExaminationSummaryModel>
     ): ExaminationRequestModel =
         ExaminationRequestModel(
-            examination.id,
-            examination.patient.firstName,
-            examination.patient.lastName,
-            examination.patient.pesel,
-            DateUtils.fromDate(examination.patient.birth),
-            examination.patient.address1,
-            examination.patient.address2,
-            examination.patient.zipCode,
-            examination.patient.city,
-            examination.patient.phone,
-            examinationDetailsSupplier.invoke()
+            examinationId = examination.id,
+            firstName = examination.patient.firstName,
+            lastName = examination.patient.lastName,
+            pesel = examination.patient.pesel,
+            birthDay = DateUtils.fromDate(examination.patient.birth),
+            address1 = examination.patient.address1,
+            address2 = examination.patient.address2,
+            zipCode = examination.patient.zipCode,
+            city = examination.patient.city,
+            phone = examination.patient.phone,
+            examinations = examinationDetailsSupplier.invoke()
         )
 
     fun fromExaminationRequestModel(model: ExaminationRequestModel, patientSupplier: () -> Patient): Examination =
         Examination(
-            null,
-            patientSupplier.invoke(),
-            LocalDateTime.now(),
-            model.examinations[0].code!!.substring(0, 1),
-            mutableSetOf()
+            id = null,
+            patient = patientSupplier.invoke(),
+            date = LocalDateTime.now(),
+            code = model.examinations[0].code!!.substring(0, 1),
+            examinationDetails = mutableSetOf()
         )
 
     fun updateFromExaminationRequestModel(examination: Examination, model: ExaminationRequestModel): Examination =
