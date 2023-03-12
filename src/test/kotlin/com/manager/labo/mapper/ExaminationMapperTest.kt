@@ -28,22 +28,22 @@ class ExaminationMapperTest {
     @BeforeEach
     fun setUp() {
         patient = Patient(
-            id = 1L,
-            firstName = "firstName",
-            lastName = "lastName",
-            pesel = "12345678901",
-            address1 = "address1",
-            address2 = "address2",
-            city = "city",
-            zipCode = "01-234",
-            phone = "123456789",
-            birth = LocalDate.of(1991, 1, 1)
+                id = 1L,
+                firstName = "firstName",
+                lastName = "lastName",
+                pesel = "12345678901",
+                address1 = "address1",
+                address2 = "address2",
+                city = "city",
+                zipCode = "01-234",
+                phone = "123456789",
+                birth = LocalDate.of(1991, 1, 1)
         )
         examination = Examination(
-            id = 1L,
-            patient = patient,
-            date = LocalDateTime.of(2023, 3, 12, 12, 0),
-            code = "code"
+                id = 1L,
+                patient = patient,
+                date = LocalDateTime.of(2023, 3, 12, 12, 0),
+                code = "code"
         )
     }
 
@@ -51,36 +51,33 @@ class ExaminationMapperTest {
     inner class ToModel {
 
         @Test
-        fun toExaminationModel() {
-            val model = tested.toExaminationModel(examination)
-
-            model.id shouldBe examination.id
-            model.requestDate shouldBe "2023-03-12 12:00:00"
-            model.code shouldBe examination.code
-            model.pesel shouldBe patient.pesel
-            model.lastName shouldBe patient.lastName
-            model.firstName shouldBe patient.firstName
-            model.address shouldBe "${patient.address1} ${patient.address2}"
-            model.phone shouldBe patient.phone
-        }
+        fun toExaminationModel() =
+            with(tested.toExaminationModel(examination)) {
+                id shouldBe examination.id
+                requestDate shouldBe "2023-03-12 12:00:00"
+                code shouldBe examination.code
+                pesel shouldBe patient.pesel
+                lastName shouldBe patient.lastName
+                firstName shouldBe patient.firstName
+                address shouldBe "${patient.address1} ${patient.address2}"
+                phone shouldBe patient.phone
+            }
 
         @Test
-        fun toExaminationRequestModel(@MockK summaryModel: ExaminationSummaryModel) {
-            val examinationDetailsSupplier = { mutableListOf(summaryModel) }
-            val model = tested.toExaminationRequestModel(examination, examinationDetailsSupplier)
-
-            model.examinationId shouldBe examination.id
-            model.firstName shouldBe patient.firstName
-            model.lastName shouldBe patient.lastName
-            model.pesel shouldBe patient.pesel
-            model.birthDay shouldBe "1991-01-01"
-            model.address1 shouldBe patient.address1
-            model.address2 shouldBe patient.address2
-            model.zipCode shouldBe patient.zipCode
-            model.city shouldBe patient.city
-            model.phone shouldBe patient.phone
-            model.examinations shouldHaveSingleElement summaryModel
-        }
+        fun toExaminationRequestModel(@MockK summaryModel: ExaminationSummaryModel) =
+            with(tested.toExaminationRequestModel(examination) { mutableListOf(summaryModel) }) {
+                examinationId shouldBe examination.id
+                firstName shouldBe patient.firstName
+                lastName shouldBe patient.lastName
+                pesel shouldBe patient.pesel
+                birthDay shouldBe "1991-01-01"
+                address1 shouldBe patient.address1
+                address2 shouldBe patient.address2
+                zipCode shouldBe patient.zipCode
+                city shouldBe patient.city
+                phone shouldBe patient.phone
+                examinations shouldHaveSingleElement summaryModel
+            }
     }
 
     @Nested
@@ -96,31 +93,23 @@ class ExaminationMapperTest {
 
 
         @Test
-        fun fromExaminationRequestModel(@MockK patient: Patient) {
-            val patientSupplier = { patient }
-
-            val examination = tested.fromExaminationRequestModel(model, patientSupplier)
-
-            examination.id shouldBe null
-            examination.patient shouldBe patient
-            examination.date shouldBeLessThanOrEqualTo LocalDateTime.now()
-            examination.code shouldBe "A"
-            examination.examinationDetails shouldHaveSize 0
-        }
+        fun fromExaminationRequestModel(@MockK patient: Patient) =
+            with(tested.fromExaminationRequestModel(model) { patient }) {
+                id shouldBe null
+                patient shouldBe patient
+                date shouldBeLessThanOrEqualTo LocalDateTime.now()
+                code shouldBe "A"
+                examinationDetails shouldHaveSize 0
+            }
 
         @Test
-        fun updateFromExaminationRequestModel() {
-            val (id,
-                examinationPatient,
-                date,
-                code,
-                examinationDetails) = tested.updateFromExaminationRequestModel(examination, model)
-
-            id shouldBe examination.id
-            examinationPatient shouldBe examination.patient
-            date shouldBeLessThanOrEqualTo LocalDateTime.now()
-            code shouldBe "A"
-            examinationDetails shouldBe examination.examinationDetails
-        }
+        fun updateFromExaminationRequestModel() =
+            with(tested.updateFromExaminationRequestModel(examination, model)) {
+                id shouldBe examination.id
+                patient shouldBe examination.patient
+                date shouldBeLessThanOrEqualTo LocalDateTime.now()
+                code shouldBe "A"
+                examinationDetails shouldBe examination.examinationDetails
+            }
     }
 }

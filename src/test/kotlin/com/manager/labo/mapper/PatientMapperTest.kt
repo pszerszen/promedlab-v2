@@ -13,10 +13,10 @@ import java.time.LocalDate
 
 class PatientMapperTest {
 
-    private val tested = PatientMapper()
-
     private lateinit var patient: Patient
     private lateinit var model: ExaminationRequestModel
+
+    private val tested = PatientMapper()
 
     @BeforeEach
     fun setUp() {
@@ -53,90 +53,62 @@ class PatientMapperTest {
         tested.toPatientModel(null) shouldBe null
 
     @Test
-    fun toPatientModel() {
-        val patientModel = tested.toPatientModel(patient)
-
-        patientModel shouldNotBe null
-
-        patientModel!!.id shouldBe patient.id
-        patientModel.pesel shouldBe patient.pesel
-        patientModel.birthDay shouldBe "1991-01-01"
-        patientModel.lastName shouldBe patient.lastName
-        patientModel.firstName shouldBe patient.firstName
-        patientModel.address1 shouldBe patient.address1
-        patientModel.address2 shouldBe patient.address2
-        patientModel.phone shouldBe patient.phone
-        patientModel.zipCode shouldBe patient.zipCode
-        patientModel.city shouldBe patient.city
-    }
+    fun toPatientModel() =
+        with(tested.toPatientModel(patient)) {
+            this shouldNotBe null
+            this!!.id shouldBe patient.id
+            pesel shouldBe patient.pesel
+            birthDay shouldBe "1991-01-01"
+            lastName shouldBe patient.lastName
+            firstName shouldBe patient.firstName
+            address1 shouldBe patient.address1
+            address2 shouldBe patient.address2
+            phone shouldBe patient.phone
+            zipCode shouldBe patient.zipCode
+            city shouldBe patient.city
+        }
 
     @Test
-    fun fromPatientModel() {
-        val patientModel = PatientModel(id = patient.id,
-                                        pesel = patient.pesel,
-                                        birthDay = "1991-01-01",
-                                        lastName = patient.lastName,
-                                        firstName = patient.firstName,
-                                        address1 = patient.address1,
-                                        address2 = patient.address2,
-                                        phone = patient.phone,
-                                        zipCode = patient.zipCode,
-                                        city = patient.city
-        )
-
-        tested.fromPatientModel(patientModel) shouldBeEqualToComparingFields patient
-    }
+    fun fromPatientModel() =
+        tested.fromPatientModel(PatientModel(id = patient.id,
+                                             pesel = patient.pesel,
+                                             birthDay = "1991-01-01",
+                                             lastName = patient.lastName,
+                                             firstName = patient.firstName,
+                                             address1 = patient.address1,
+                                             address2 = patient.address2,
+                                             phone = patient.phone,
+                                             zipCode = patient.zipCode,
+                                             city = patient.city)) shouldBeEqualToComparingFields patient
 
     @Test
-    fun fromExaminationRequestModel() {
-        val (id,
-            firstName,
-            lastName,
-            pesel,
-            address1,
-            address2,
-            city,
-            zipCode,
-            phone,
-            birth,
-            examinations) = tested.fromExaminationRequestModel(model)
-
-        id shouldBe null
-        firstName shouldBe model.firstName
-        lastName shouldBe model.lastName
-        pesel shouldBe model.pesel
-        address1 shouldBe model.address1
-        address2 shouldBe model.address2
-        city shouldBe model.city
-        zipCode shouldBe model.zipCode
-        phone shouldBe model.phone
-        birth shouldBe patient.birth
-        examinations shouldHaveSize 0
-    }
+    fun fromExaminationRequestModel(): Unit =
+        with(tested.fromExaminationRequestModel(model)) {
+            id shouldBe null
+            firstName shouldBe model.firstName
+            lastName shouldBe model.lastName
+            pesel shouldBe model.pesel
+            address1 shouldBe model.address1
+            address2 shouldBe model.address2
+            city shouldBe model.city
+            zipCode shouldBe model.zipCode
+            phone shouldBe model.phone
+            birth shouldBe patient.birth
+            examinations shouldHaveSize 0
+        }
 
     @Test
-    fun updateFromExaminationRequestMapper() {
-        val (id,
-            firstName,
-            lastName,
-            pesel,
-            address1,
-            address2,
-            city,
-            zipCode,
-            phone,
-            birth,
-            examinations) = tested.updateFromExaminationRequestMapper(patient, model)
-
-        id shouldBe patient.id
-        firstName shouldBe model.firstName
-        lastName shouldBe model.lastName
-        pesel shouldBe model.pesel
-        address1 shouldBe model.address1
-        address2 shouldBe model.address2
-        city shouldBe model.city
-        zipCode shouldBe model.zipCode
-        phone shouldBe patient.phone
-        birth shouldBe patient.birth
-    }
+    fun updateFromExaminationRequestMapper() =
+        with(tested.updateFromExaminationRequestMapper(patient, model)) {
+            id shouldBe patient.id
+            firstName shouldBe model.firstName
+            lastName shouldBe model.lastName
+            pesel shouldBe model.pesel
+            address1 shouldBe model.address1
+            address2 shouldBe model.address2
+            city shouldBe model.city
+            zipCode shouldBe model.zipCode
+            phone shouldBe patient.phone
+            birth shouldBe patient.birth
+        }
 }

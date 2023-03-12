@@ -8,7 +8,6 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.time.LocalDateTime
@@ -16,11 +15,7 @@ import java.time.LocalDateTime
 @ExtendWith(MockKExtension::class)
 class ExaminationDetailsMapperTest {
 
-    val tested = ExaminationDetailsMapper()
-
-    @BeforeEach
-    fun setUp() {
-    }
+    private val tested = ExaminationDetailsMapper()
 
     @Test
     fun fromExaminationSummaryModel(@MockK examination: Examination) {
@@ -36,20 +31,17 @@ class ExaminationDetailsMapperTest {
 
     @Test
     fun updateFromExaminationSummaryModel(@MockK examination: Examination) {
-        val details = ExaminationDetails(
-            id = 1L,
-            examination = examination,
-            code = "code",
-            value = null,
-            staffName = null,
-            date = LocalDateTime.now()
-        )
-        val model = ExaminationSummaryModel(
-            id = null,
-            code = null,
-            description = null,
-            staffName = "staffName",
-            value = 12
+        val details = ExaminationDetails(id = 1L,
+                                         examination = examination,
+                                         code = "code",
+                                         value = null,
+                                         staffName = null,
+                                         date = LocalDateTime.now())
+        val model = ExaminationSummaryModel(id = null,
+                                            code = null,
+                                            description = null,
+                                            staffName = "staffName",
+                                            value = 12
         )
 
         val actual = tested.updateFromExaminationSummaryModel(details, model)
@@ -63,14 +55,14 @@ class ExaminationDetailsMapperTest {
     }
 
     @Test
-    fun toExaminationSummaryModel(@MockK examination: Examination, @MockK descriptionSupplier: (code: String) -> String) {
-        val examinationDetails = ExaminationDetails(
-            id = 1L,
-            examination = examination,
-            code = "code",
-            value = 12,
-            staffName = "staffName",
-            date = LocalDateTime.now()
+    fun toExaminationSummaryModel(@MockK examination: Examination,
+                                  @MockK descriptionSupplier: (code: String) -> String) {
+        val examinationDetails = ExaminationDetails(id = 1L,
+                                                    examination = examination,
+                                                    code = "code",
+                                                    value = 12,
+                                                    staffName = "staffName",
+                                                    date = LocalDateTime.now()
         )
         every { descriptionSupplier.invoke(examinationDetails.code) } returns "description"
 
