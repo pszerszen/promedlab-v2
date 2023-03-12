@@ -22,10 +22,10 @@ class ExaminationDetailsMapper {
 
     fun toExaminationSummaryModel(examinationDetails: ExaminationDetails, descriptionSupplier: (code: String) -> String): ExaminationSummaryModel =
         ExaminationSummaryModel(
-            examinationDetails.id,
-            examinationDetails.code,
-            descriptionSupplier.invoke(examinationDetails.code),
-            examinationDetails.staffName,
-            examinationDetails.value)
+            id = examinationDetails.id,
+            code = examinationDetails.code,
+            description = descriptionSupplier.invoke(examinationDetails.code),
+            staffName = examinationDetails.staffName,
+            value = examinationDetails.value)
 
 }
