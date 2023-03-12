@@ -10,7 +10,6 @@ import com.manager.labo.model.ExaminationRequestModel
 import com.manager.labo.model.ExaminationSummaryModel
 import com.manager.labo.repository.ExaminationDetailsRepository
 import com.manager.labo.repository.ExaminationRepository
-import com.manager.labo.repository.PatientRepository
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -25,10 +24,9 @@ import java.util.function.Consumer
 class ExaminationService(
     private val examinationRepository: ExaminationRepository,
     private val examinationDetailsRepository: ExaminationDetailsRepository,
-    private val patientRepository: PatientRepository,
-    private val patientService: PatientService,
     private val examinationDetailsMapper: ExaminationDetailsMapper,
     private val examinationMapper: ExaminationMapper,
+    private val patientService: PatientService,
     private val icdService: IcdService
 ) {
 

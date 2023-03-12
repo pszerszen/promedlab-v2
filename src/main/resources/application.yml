@@ -5,9 +5,26 @@ spring:
     clear-checksums: false
     drop-first: false
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/labo
     username: root
     password: admin!123
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
+
+logging:
+  level:
+    com:
+      manager:
+        labo: DEBUG
+view:
+  default-sizes:
+    - type: com.manager.labo.view.MainPanel
+      width: 440
+      height: 135
+    - type: com.manager.labo.view.AbstractListPanel
+      width: 1000
+      height: 600
+    - type: com.manager.labo.view.ExaminationDetailsForm
+      width: 800
+      height: 730
