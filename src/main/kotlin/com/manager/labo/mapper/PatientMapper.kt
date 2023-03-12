@@ -11,62 +11,58 @@ class PatientMapper {
 
     fun toPatientModel(patient: Patient?): PatientModel? =
         if (patient == null) null
-        else PatientModel(
-            patient.id,
-            patient.pesel,
-            DateUtils.fromDate(patient.birth),
-            patient.lastName,
-            patient.firstName,
-            patient.address1,
-            patient.address2,
-            patient.phone,
-            patient.zipCode,
-            patient.city
+        else PatientModel(id = patient.id,
+                          patient.pesel,
+                          DateUtils.fromDate(patient.birth),
+                          patient.lastName,
+                          patient.firstName,
+                          address1 = patient.address1,
+                          address2 = patient.address2,
+                          phone = patient.phone,
+                          zipCode = patient.zipCode,
+                          city = patient.city
         )
 
     fun fromPatientModel(model: PatientModel): Patient =
-        Patient(
-            model.id,
-            model.firstName!!,
-            model.lastName!!,
-            model.pesel,
-            model.address1!!,
-            model.address2,
-            model.city!!,
-            model.zipCode!!,
-            model.phone!!,
-            DateUtils.toDate(model.birthDay!!),
-            mutableSetOf()
+        Patient(id = model.id,
+                firstName = model.firstName!!,
+                lastName = model.lastName!!,
+                pesel = model.pesel,
+                address1 = model.address1!!,
+                address2 = model.address2,
+                city = model.city!!,
+                zipCode = model.zipCode!!,
+                phone = model.phone!!,
+                birth = DateUtils.toDate(model.birthDay!!),
+                examinations = mutableSetOf()
         )
 
     fun fromExaminationRequestModel(model: ExaminationRequestModel) =
-        Patient(
-            firstName = model.firstName!!,
-            lastName = model.lastName!!,
-            pesel = model.pesel,
-            address1 = model.address1!!,
-            address2 = when (val it = model.address2) {
-                "" -> null
-                else -> it
-            },
-            city = model.city!!,
-            zipCode = model.zipCode!!,
-            phone = model.phone!!,
-            birth = DateUtils.toDate(model.birthDay!!)
+        Patient(firstName = model.firstName!!,
+                lastName = model.lastName!!,
+                pesel = model.pesel,
+                address1 = model.address1!!,
+                address2 = when (val it = model.address2) {
+                    ""   -> null
+                    else -> it
+                },
+                city = model.city!!,
+                zipCode = model.zipCode!!,
+                phone = model.phone!!,
+                birth = DateUtils.toDate(model.birthDay!!)
         )
 
     fun updateFromExaminationRequestMapper(patient: Patient, model: ExaminationRequestModel) =
-        patient.copy(
-            firstName = model.firstName!!,
-            lastName = model.lastName!!,
-            pesel = model.pesel,
-            address1 = model.address1!!,
-            address2 = when (val it = model.address2) {
-                "" -> null
-                else -> it
-            },
-            city = model.city!!,
-            zipCode = model.zipCode!!,
-            birth = DateUtils.toDate(model.birthDay!!)
+        patient.copy(firstName = model.firstName!!,
+                     lastName = model.lastName!!,
+                     pesel = model.pesel,
+                     address1 = model.address1!!,
+                     address2 = when (val it = model.address2) {
+                         ""   -> null
+                         else -> it
+                     },
+                     city = model.city!!,
+                     zipCode = model.zipCode!!,
+                     birth = DateUtils.toDate(model.birthDay!!)
         )
 }

@@ -9,23 +9,23 @@ import java.time.LocalDateTime
 @Component
 class ExaminationDetailsMapper {
 
-    fun fromExaminationSummaryModel(model: ExaminationSummaryModel, examinationSupplier: () -> Examination): ExaminationDetails =
-        ExaminationDetails(
-            code = model.code!!,
-            examination = examinationSupplier.invoke(),
-            date = LocalDateTime.now())
+    fun fromExaminationSummaryModel(model: ExaminationSummaryModel,
+                                    examinationSupplier: () -> Examination): ExaminationDetails =
+        ExaminationDetails(code = model.code!!,
+                           examination = examinationSupplier.invoke(),
+                           date = LocalDateTime.now())
 
-    fun updateFromExaminationSummaryModel(details: ExaminationDetails, model: ExaminationSummaryModel): ExaminationDetails =
-        details.copy(
-            staffName = model.staffName,
-            value = model.value)
+    fun updateFromExaminationSummaryModel(details: ExaminationDetails,
+                                          model: ExaminationSummaryModel): ExaminationDetails =
+        details.copy(staffName = model.staffName,
+                     value = model.value)
 
-    fun toExaminationSummaryModel(examinationDetails: ExaminationDetails, descriptionSupplier: (code: String) -> String): ExaminationSummaryModel =
-        ExaminationSummaryModel(
-            examinationDetails.id,
-            examinationDetails.code,
-            descriptionSupplier.invoke(examinationDetails.code),
-            examinationDetails.staffName,
-            examinationDetails.value)
+    fun toExaminationSummaryModel(examinationDetails: ExaminationDetails,
+                                  descriptionSupplier: (code: String) -> String): ExaminationSummaryModel =
+        ExaminationSummaryModel(id = examinationDetails.id,
+                                code = examinationDetails.code,
+                                description = descriptionSupplier.invoke(examinationDetails.code),
+                                staffName = examinationDetails.staffName,
+                                value = examinationDetails.value)
 
 }
