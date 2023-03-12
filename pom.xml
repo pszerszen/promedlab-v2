@@ -23,6 +23,7 @@
 		<kotlin.version>1.8.10</kotlin.version>
 		<mapstruct.version>1.5.3.Final</mapstruct.version>
 		<mockk.version>1.13.4</mockk.version>
+		<kotest.version>5.5.5</kotest.version>
 	</properties>
 
 	<dependencyManagement>
@@ -116,6 +117,13 @@
 			<version>${mockk.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.kotest</groupId>
+			<artifactId>kotest-runner-junit5-jvm</artifactId>
+			<version>${kotest.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 
 	</dependencies>
 
