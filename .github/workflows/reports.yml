@@ -1,7 +1,7 @@
 name: reports
 on:
   workflow_run:
-    workflows: [ build ]
+    workflows: [ unit-tests ]
     types: [ completed ]
 
 permissions:
