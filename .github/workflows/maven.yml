@@ -21,7 +21,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -45,23 +44,11 @@ jobs:
 
       - name: Upload JaCoCo Report
         uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: jacoco-report
           path: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
 
----
-name: test reports
-on:
-  workflow_run:
-    workflows: [ build ]
-    types: [ completed ]
-
-permissions:
-  contents: read
-  checks: write
-  id-token: write
-
-jobs:
   checks:
     runs-on: ubuntu-latest
     steps:
