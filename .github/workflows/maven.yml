@@ -40,15 +40,15 @@ jobs:
         if: success() || failure() # always run even if the previous step fails
         with:
           report_paths: '**/surefire-reports/TEST-*.xml'
-
-      - name: Upload Report
-        uses: 'actions/upload-artifact@v2'
-        with:
-          name: jacoco-report
-          path: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
+#
+#      - name: Upload Report
+#        uses: 'actions/upload-artifact@v2'
+#        with:
+#          name: jacoco-report
+#          path: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
 
       - name: JaCoCo Report
-        uses: Madrapps/jacoco-report@v1.2
+        uses: Madrapps/jacoco-report@v1.3
         with:
           paths: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
