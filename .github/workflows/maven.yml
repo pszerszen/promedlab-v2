@@ -48,11 +48,10 @@ jobs:
           path: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
 
       - name: JaCoCo Report
-        uses: Madrapps/jacoco-report@v1.3
+        uses: Madrapps/jacoco-report@v1.2
         with:
           paths: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-          title: Code Coverage
           min-coverage-overall: 40
           min-coverage-changed-files: 60
 
