@@ -33,14 +33,16 @@ jobs:
           distribution: 'zulu'
           cache: maven
       - name: Build and Test with Maven
-        run: mvn clean test --file pom.xml -B -fae
+        run: mvn clean verify --file pom.xml -B -fae
       - name: Publish Test Report
-        if: success() || failure()
-        uses: scacap/action-surefire-report@v1
+        uses: mikepenz/action-junit-report@v3
+        if: success() || failure() # always run even if the previous step fails
+        with:
+          report_paths: '**/surefire-reports/TEST-*.xml'
       - name: JaCoCo Report
         uses: Madrapps/jacoco-report@v1.3
         with:
-          paths: ${{ github.workspace }}/build/reports/jacoco/testCoverage/testCoverage.xml
+          paths: '**/jacoco/jacoco.xml'
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 40
           min-coverage-changed-files: 60
