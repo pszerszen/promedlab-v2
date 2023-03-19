@@ -28,7 +28,7 @@ jobs:
           distribution: 'zulu'
           cache: maven
       - name: Build with Maven
-        run: mvn clean test --file pom.xml
+        run: mvn clean test --file pom.xml -B
       - name: JaCoCo Report
         uses: Madrapps/jacoco-report@v1.3
         with:
