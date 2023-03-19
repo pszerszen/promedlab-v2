@@ -49,6 +49,19 @@ jobs:
           name: jacoco-report
           path: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
 
+---
+name: reports
+on:
+  workflow_run:
+    workflows: [ build ]
+    types: [ completed ]
+
+permissions:
+  contents: read
+  checks: write
+  id-token: write
+
+jobs:
   checks:
     runs-on: ubuntu-latest
     steps:
