@@ -19,7 +19,7 @@ import javax.validation.constraints.Pattern
 class ExaminationRequestValidator {
 
     @Throws(IllegalArgumentException::class, IllegalAccessException::class)
-    fun validate(model: ExaminationRequestModel, validateExamiations: Boolean): Set<String> {
+    fun validate(model: ExaminationRequestModel, validateExaminations: Boolean): Set<String> {
         val errors: MutableSet<String> = mutableSetOf()
         for (field in model.javaClass.declaredFields) {
             extractAndValidateField(field, model, errors)
@@ -28,7 +28,7 @@ class ExaminationRequestValidator {
         if (CollectionUtils.isEmpty(examinations)) {
             errors.add("Należy wybrać przynajmniej jedno badanie.")
         }
-        if (validateExamiations) {
+        if (validateExaminations) {
             examinations.forEach { examination ->
                 for (field in examination!!.javaClass.declaredFields) {
                     try {
@@ -43,9 +43,9 @@ class ExaminationRequestValidator {
     }
 
     @Throws(IllegalArgumentException::class, IllegalAccessException::class)
-    private fun extractAndValidateField(field: Field, `object`: Any, errors: MutableSet<String>) {
+    private fun extractAndValidateField(field: Field, targetObject: Any, errors: MutableSet<String>) {
         field.isAccessible = true
-        val objectVal = field[`object`]
+        val objectVal = field[targetObject]
         val fieldValue = objectVal?.toString() ?: ""
         val error = validateField(field, fieldValue)
         if (error != null) {

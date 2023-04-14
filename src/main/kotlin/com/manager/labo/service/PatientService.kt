@@ -19,12 +19,6 @@ class PatientService(
     private val patientMapper: PatientMapper
 ) {
 
-    fun save(patient: Patient): Patient = patientRepository.save(patient)
-
-    fun get(id: Long): Patient? = patientRepository.findByIdOrNull(id)
-
-    fun getByPesel(pesel: String): Patient? = patientRepository.getByPesel(pesel)
-
     fun getPatientModelByPesel(pesel: String): PatientModel? = patientMapper.toPatientModel(getByPesel(pesel))
 
     fun getById(id: Long): PatientModel = patientMapper.toPatientModel(get(id))!!
@@ -35,7 +29,10 @@ class PatientService(
         var patient: Patient? = patientRepository.getByPesel(model.pesel!!)
         patient = if (patient == null) patientMapper.fromExaminationRequestModel(model)
         else patientMapper.updateFromExaminationRequestMapper(patient, model)
-        patient = patientRepository.save(patient)
-        return patient
+        return patientRepository.save(patient)
     }
+
+    private fun getByPesel(pesel: String): Patient? = patientRepository.getByPesel(pesel)
+
+    private fun get(id: Long): Patient? = patientRepository.findByIdOrNull(id)
 }
